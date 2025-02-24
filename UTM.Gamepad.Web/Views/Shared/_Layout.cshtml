@@ -1,0 +1,147 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- basic -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+
+    <title>@ViewBag.Title - Gamepad</title>
+    <!-- CSS Bundle -->
+    @Styles.Render("~/bundles/css")
+
+    <!-- Внешние библиотеки -->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+    
+    <!-- Подключение CSS напрямую -->
+    <link rel="stylesheet" type="text/css" href="~/Content/css/style.css">
+
+    <!-- Внешние библиотеки -->
+    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+</head>
+<body>
+
+
+<!-- 🔹 Шапка сайта (навигация) -->
+<div class="header_section">
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <div class="logo">
+            <!-- логотип сайта -->
+            <a href="@Url.Action("Index", "Home")">
+                <img src="~/Content/images/logo.png" alt="Gamepad Logo"/>
+            </a>
+        </div>
+        <!-- кнопка для мобильного меню -->
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <!-- главное меню -->
+            <ul class="navbar-nav mr-auto">
+                <!-- ссылки на страницы -->
+                <li class="nav-item">@Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("About", "About", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Products", "Product", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Video Games", "Video", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Remote Control", "Remote", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Contact", "Contact", "Home", null, new { @class = "nav-link" })</li>
+
+                <!-- иконка поиска -->
+                <li class="nav-item">
+                    <a class="nav-link" href="#"><img src="~/Content/images/search-icon.png" /></a>
+                </li>
+
+                <!-- ссылки для входа и регистрации -->
+                <li class="nav-item">@Html.ActionLink("Sign In", "Login", "Account", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Register", "Register", "Account", null, new { @class = "nav-link" })</li>
+            </ul>
+        </div>
+    </nav>
+</div>
+<!-- конец шапки -->
+
+<!-- здесь будет загружаться содержимое страниц -->
+@RenderBody()
+
+<!-- 🔹 Подвал сайта -->
+<div class="section_footer">
+    <div class="container">
+        <div class="footer_section_2">
+            <div class="row">
+                <!-- блок "О нас" -->
+                <div class="col-sm-6 col-md-6 col-lg-3">
+                    <h2 class="account_text">About Us</h2>
+                    <p class="ipsum_text_2">Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                </div>
+
+                <!-- полезные ссылки -->
+                <div class="col-sm-6 col-md-6 col-lg-3">
+                    <h2 class="account_text">Useful Link</h2>
+                    <div class="useful_link">
+                        <ul>
+                            <li><a href="#">Video games</a></li>
+                            <li><a href="#">Remote control</a></li>
+                            <li><a href="#">3d controller</a></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- контакты -->
+                <div class="col-sm-6 col-md-6 col-lg-3">
+                    <h2 class="account_text">Contact Us</h2>
+                    <p class="ipsum_text_2">Address: 123 Street, City, Country.</p>
+                </div>
+
+                <!-- подписка на рассылку -->
+                <div class="col-sm-6 col-md-6 col-lg-3">
+                    <h2 class="account_text">Newsletter</h2>
+                    <input type="email" class="email_text" placeholder="Enter Your Email" name="Enter Your Email">
+                    <button class="subscribr_bt">SUBSCRIBE</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- социальные иконки -->
+        <div class="social_icon">
+            <ul>
+                <li><a href="#"><img src="~/Content/images/fb-icon.png"></a></li>
+                <li><a href="#"><img src="~/Content/images/twitter-icon.png"></a></li>
+                <li><a href="#"><img src="~/Content/images/linkedin-icon.png"></a></li>
+                <li><a href="#"><img src="~/Content/images/instagram-icon.png"></a></li>
+            </ul>
+        </div>
+    </div>
+</div>
+<!-- конец подвала -->
+
+<!-- 🔹 Копирайт -->
+<div class="copyright_section">
+    <div class="container">
+        <p class="copyright_text">© 2024 Gamepad. All rights reserved.</p>
+    </div>
+</div>
+
+<!-- jQuery с CDN + fallback -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    if (typeof jQuery == 'undefined') {
+        document.write('<script src="@Url.Content("~/Content/js/jquery.min.js")"><\/script>');
+    }
+</script>
+
+<!-- Подключение JS в правильном порядке -->
+<script src="~/Content/js/jquery-3.0.0.min.js"></script>
+@Scripts.Render("~/bundles/jquery")
+@Scripts.Render("~/bundles/bootstrap")
+@Scripts.Render("~/bundles/plugins")
+
+<!-- Внешние библиотеки -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/OwlCarousel2/2.3.4/owl.carousel.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.js"></script>
+
+@RenderSection("scripts", required: false)
+
+</body>
+</html>
