@@ -2,6 +2,12 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Web", "UTM.Gamepad.Web\UTM.Gamepad.Web.csproj", "{00035230-6B97-46D1-B47D-4BB5EDAC96E2}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Domain", "UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj", "{E4FDB5F5-572B-47F8-9110-49646DD80B4A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Application", "UTM.Gamepad.Application\UTM.Gamepad.Application.csproj", "{7682E787-7E29-4722-9827-D4D783B25321}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Infrastructure", "UTM.Gamepad.Infrastructure\UTM.Gamepad.Infrastructure.csproj", "{737E1BA4-BA1B-4388-9FC2-55253B433BC7}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +18,17 @@ Global
 		{00035230-6B97-46D1-B47D-4BB5EDAC96E2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{00035230-6B97-46D1-B47D-4BB5EDAC96E2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{00035230-6B97-46D1-B47D-4BB5EDAC96E2}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E4FDB5F5-572B-47F8-9110-49646DD80B4A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E4FDB5F5-572B-47F8-9110-49646DD80B4A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E4FDB5F5-572B-47F8-9110-49646DD80B4A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E4FDB5F5-572B-47F8-9110-49646DD80B4A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7682E787-7E29-4722-9827-D4D783B25321}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7682E787-7E29-4722-9827-D4D783B25321}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7682E787-7E29-4722-9827-D4D783B25321}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7682E787-7E29-4722-9827-D4D783B25321}.Release|Any CPU.Build.0 = Release|Any CPU
+		{737E1BA4-BA1B-4388-9FC2-55253B433BC7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{737E1BA4-BA1B-4388-9FC2-55253B433BC7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{737E1BA4-BA1B-4388-9FC2-55253B433BC7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{737E1BA4-BA1B-4388-9FC2-55253B433BC7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
