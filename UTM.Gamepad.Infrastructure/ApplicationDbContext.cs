@@ -1,10 +1,16 @@
 ﻿using System.Data.Entity;
+using System.Data.Entity.SqlServer;
 using UTM.Gamepad.Domain;
 
 namespace UTM.Gamepad.Infrastructure
 {
     public class ApplicationDbContext : DbContext
     {
+        static ApplicationDbContext()
+        {
+            var instance = SqlProviderServices.Instance;
+        }
+        
         public ApplicationDbContext() 
             : base("GameStoreDb")
         {
@@ -15,6 +21,7 @@ namespace UTM.Gamepad.Infrastructure
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<Review> Reviews { get; set; }
+        public DbSet<Role> Roles { get; set; }
 
         protected override void OnModelCreating(DbModelBuilder modelBuilder)
         {
@@ -48,6 +55,12 @@ namespace UTM.Gamepad.Infrastructure
                 .HasRequired(oi => oi.Product)
                 .WithMany(p => p.OrderItems)
                 .HasForeignKey(oi => oi.ProductId)
+                .WillCascadeOnDelete(false);
+                
+            modelBuilder.Entity<User>()
+                .HasOptional(u => u.Role)
+                .WithMany(r => r.Users)
+                .HasForeignKey(u => u.RoleId)
                 .WillCascadeOnDelete(false);
         }
     }
