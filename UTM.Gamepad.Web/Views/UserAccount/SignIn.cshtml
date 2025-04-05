@@ -1,0 +1,278 @@
+﻿@{
+ViewBag.Title = "Вход в систему";
+Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Вход в систему - Gamepad</title>
+    
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        body, html {
+            height: 100%;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
+            background-size: cover;
+            background-attachment: fixed;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .auth-page {
+            width: 100%;
+            max-width: 450px;
+        }
+        
+        .auth-card {
+            background-color: rgba(255, 255, 255, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+        
+        .auth-card-header {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            padding: 25px 30px;
+            position: relative;
+        }
+        
+        .auth-card-header h3 {
+            margin: 0;
+            font-weight: 600;
+            font-size: 24px;
+        }
+        
+        .auth-card-header h3 i {
+            margin-right: 10px;
+        }
+        
+        .auth-card-body {
+            padding: 30px;
+        }
+        
+        .auth-card-footer {
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+            text-align: center;
+        }
+        
+        .form-control {
+            height: calc(2.5rem + 2px);
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background-color: #f8f9fa;
+        }
+        
+        .form-control:focus {
+            border-color: #2575fc;
+            box-shadow: 0 0 0 0.2rem rgba(37, 117, 252, 0.25);
+            background-color: #fff;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            border: none;
+            padding: 12px 15px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            transition: all 0.3s ease;
+            border-radius: 30px;
+        }
+        
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #5a0cb6 0%, #1565e6 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(37, 117, 252, 0.4);
+        }
+        
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+        
+        .toggle-password {
+            cursor: pointer;
+            border-top-right-radius: 5px;
+            border-bottom-right-radius: 5px;
+            border-color: #ddd;
+        }
+        
+        label {
+            font-weight: 500;
+            margin-bottom: 8px;
+            color: #444;
+        }
+        
+        .logo-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-container img {
+            max-height: 60px;
+        }
+        
+        .back-to-site {
+            text-align: center;
+            margin-top: 20px;
+        }
+        
+        .back-to-site a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 20px;
+            background-color: rgba(255, 255, 255, 0.2);
+        }
+        
+        .back-to-site a:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .back-to-site i {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="auth-page">
+    <div class="logo-container">
+        <img src="~/Content/images/logo.png" alt="Gamepad Logo">
+    </div>
+    
+    <div class="auth-card">
+        <div class="auth-card-header">
+            <h3><i class="fas fa-sign-in-alt"></i> Вход в систему</h3>
+        </div>
+        <div class="auth-card-body">
+            <p class="text-muted mb-4">Добро пожаловать! Пожалуйста, введите ваши учетные данные для входа.</p>
+            
+            @if (ViewBag.ErrorMessage != null)
+            {
+                <div class="alert alert-danger" role="alert">
+                    <i class="fas fa-exclamation-circle"></i> @ViewBag.ErrorMessage
+                </div>
+            }
+            
+            <form method="post" action="@Url.Action("SignIn", "UserAccount")">
+                @Html.AntiForgeryToken()
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <div class="input-group">
+                        <div class="input-group-prepend">
+                            <span class="input-group-text"><i class="fas fa-envelope"></i></span>
+                        </div>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Введите ваш email" required>
+                    </div>
+                </div>
+
+                <div class="form-group mb-4">
+                    <label for="password"><i class="fas fa-lock"></i> Пароль</label>
+                    <div class="input-group">
+                        <input id="password" class="form-control" type="password" name="password" placeholder="Введите ваш пароль" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-outline-secondary toggle-password" type="button" tabindex="-1">
+                                <i class="fas fa-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="invalid-feedback">Пожалуйста, введите пароль</div>
+                </div>
+                
+                <div class="form-group form-check mb-4">
+                    <input type="checkbox" class="form-check-input" id="rememberMe" name="rememberMe">
+                    <label class="form-check-label" for="rememberMe">Запомнить меня</label>
+                </div>
+
+                <div class="form-group mb-4">
+                    <button id="submit" type="submit" class="btn btn-primary btn-block">
+                        <i class="fas fa-sign-in-alt"></i> Войти
+                    </button>
+                </div>
+            </form>
+            
+            <div class="auth-card-footer">
+                <p>Нет аккаунта? <a href="@Url.Action("SignUp", "UserAccount")" class="text-primary">Зарегистрироваться</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <div class="back-to-site">
+        <a href="@Url.Action("Index", "Home")"><i class="fas fa-home"></i> Вернуться на главную</a>
+    </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+
+<script>
+    // Валидация формы
+    (function() {
+        'use strict';
+        window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            Array.prototype.filter.call(forms, function(form) {
+                form.addEventListener('submit', function(event) {
+                    if (form.checkValidity() === false) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        }, false);
+    })();
+    
+    // Функция показа/скрытия пароля
+    document.addEventListener('DOMContentLoaded', function() {
+        var toggleButtons = document.getElementsByClassName('toggle-password');
+        Array.prototype.filter.call(toggleButtons, function(button) {
+            button.addEventListener('click', function() {
+                var input = this.parentNode.parentNode.querySelector('input');
+                if (input.type === 'password') {
+                    input.type = 'text';
+                    this.querySelector('i').classList.remove('fa-eye');
+                    this.querySelector('i').classList.add('fa-eye-slash');
+                } else {
+                    input.type = 'password';
+                    this.querySelector('i').classList.remove('fa-eye-slash');
+                    this.querySelector('i').classList.add('fa-eye');
+                }
+            });
+        });
+    });
+</script>
+
+</body>
+</html>
