@@ -1,9 +1,14 @@
 ﻿using System.Web.Mvc; // Подключаем библиотеку для работы с веб-страницами (MVC)
+using System.Linq;
+using UTM.Gamepad.Application.Services;
 
 namespace UTM.Gamepad.Web.Controllers // Пространство имён (где находится этот код)
 {
     public class HomeController : Controller // Этот класс управляет страницами сайта
     {
+        private readonly UserService _userService = new UserService();
+        private readonly RoleService _roleService = new RoleService();
+        
         // Метод (экшен) для главной страницы (Главная / Home)
         public ActionResult Index()
         {
@@ -43,6 +48,24 @@ namespace UTM.Gamepad.Web.Controllers // Пространство имён (гд
         {
             ViewBag.Title = "Your contact page."; // Заголовок страницы
             return View(); // Открывает страницу "Contact.cshtml"
+        }
+
+        [Authorize(Roles = "Admin")]
+        public ActionResult AdminPanel()
+        {
+            return View();
+        }
+
+        // Метод для перенаправления на страницу входа
+        public ActionResult Login()
+        {
+            return RedirectToAction("SignIn", "UserAccount");
+        }
+        
+        // Метод для перенаправления на страницу регистрации
+        public ActionResult Register()
+        {
+            return RedirectToAction("SignUp", "UserAccount");
         }
     }
 }
