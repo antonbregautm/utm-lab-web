@@ -1,0 +1,194 @@
+@model UTM.Gamepad.Domain.Order
+@{
+    ViewBag.Title = "Checkout";
+    var cartItems = Session["Cart"] as List<UTM.Gamepad.Domain.OrderItem>;
+    decimal totalAmount = cartItems != null ? cartItems.Sum(item => item.Price * item.Quantity) : 0;
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-credit-card"></i> Checkout
+            </h2>
+            <p class="lead text-muted">Complete your order by providing shipping and payment information</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="@Url.Action("Cart", "Shop")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Cart
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="row">
+        <div class="col-md-8">
+            @using (Html.BeginForm("PlaceOrder", "Shop", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+            {
+                @Html.AntiForgeryToken()
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Shipping Information</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-12">
+                                <label for="ShippingAddress">Address</label>
+                                @Html.TextBoxFor(m => m.ShippingAddress, new { @class = "form-control", placeholder = "1234 Main St", required = "required" })
+                                <div class="invalid-feedback">Please enter your shipping address.</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="City">City</label>
+                                @Html.TextBoxFor(m => m.City, new { @class = "form-control", required = "required" })
+                                <div class="invalid-feedback">Please enter your city.</div>
+                            </div>
+                            <div class="form-group col-md-4">
+                                <label for="State">State/Province</label>
+                                @Html.TextBoxFor(m => m.State, new { @class = "form-control", required = "required" })
+                                <div class="invalid-feedback">Please enter your state/province.</div>
+                            </div>
+                            <div class="form-group col-md-2">
+                                <label for="ZipCode">Zip Code</label>
+                                @Html.TextBoxFor(m => m.ZipCode, new { @class = "form-control", required = "required" })
+                                <div class="invalid-feedback">Please enter your zip code.</div>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group col-md-6">
+                                <label for="Country">Country</label>
+                                @Html.TextBoxFor(m => m.Country, new { @class = "form-control", required = "required" })
+                                <div class="invalid-feedback">Please enter your country.</div>
+                            </div>
+                            <div class="form-group col-md-6">
+                                <label for="PhoneNumber">Phone Number</label>
+                                @Html.TextBoxFor(m => m.PhoneNumber, new { @class = "form-control", placeholder = "(123) 456-7890", required = "required" })
+                                <div class="invalid-feedback">Please enter your phone number.</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card shadow-sm mb-4">
+                    <div class="card-header bg-light">
+                        <h5 class="mb-0">Payment Method</h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-group">
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" id="paymentMethod1" name="PaymentMethod" class="custom-control-input" value="Credit Card" checked required>
+                                <label class="custom-control-label" for="paymentMethod1">
+                                    <i class="fab fa-cc-visa mr-1"></i>
+                                    <i class="fab fa-cc-mastercard mr-1"></i>
+                                    Credit Card
+                                </label>
+                            </div>
+                            <div class="custom-control custom-radio mb-2">
+                                <input type="radio" id="paymentMethod2" name="PaymentMethod" class="custom-control-input" value="PayPal" required>
+                                <label class="custom-control-label" for="paymentMethod2">
+                                    <i class="fab fa-paypal mr-1"></i>
+                                    PayPal
+                                </label>
+                            </div>
+                            <div class="custom-control custom-radio">
+                                <input type="radio" id="paymentMethod3" name="PaymentMethod" class="custom-control-input" value="Cash on Delivery" required>
+                                <label class="custom-control-label" for="paymentMethod3">
+                                    <i class="fas fa-money-bill-wave mr-1"></i>
+                                    Cash on Delivery
+                                </label>
+                            </div>
+                        </div>
+                        <div class="alert alert-info small mt-3">
+                            <i class="fas fa-info-circle"></i> For demonstration purposes, no actual payment will be processed.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <a href="@Url.Action("Cart", "Shop")" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Cart
+                    </a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-check"></i> Place Order
+                    </button>
+                </div>
+            }
+        </div>
+        
+        <div class="col-md-4">
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-light">
+                    <h5 class="mb-0">Order Summary</h5>
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        @if (cartItems != null && cartItems.Any())
+                        {
+                            foreach (var item in cartItems)
+                            {
+                                <li class="list-group-item d-flex justify-content-between align-items-center px-3 py-2">
+                                    <div class="d-flex align-items-center">
+                                        <img src="@(string.IsNullOrEmpty(item.ProductImageUrl) ? "/Content/images/default-product.jpg" : item.ProductImageUrl)" 
+                                             alt="@item.ProductName" class="img-thumbnail mr-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                        <div>
+                                            <div class="font-weight-bold">@item.ProductName</div>
+                                            <small class="text-muted">Qty: @item.Quantity</small>
+                                        </div>
+                                    </div>
+                                    <span>$@((item.Price * item.Quantity).ToString("0.00"))</span>
+                                </li>
+                            }
+                        }
+                    </ul>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Subtotal:</span>
+                        <span>$@totalAmount.ToString("0.00")</span>
+                    </div>
+                    <div class="d-flex justify-content-between mb-2">
+                        <span>Shipping:</span>
+                        <span>Free</span>
+                    </div>
+                    <hr class="my-2">
+                    <div class="d-flex justify-content-between font-weight-bold">
+                        <span>Total:</span>
+                        <span class="text-primary">$@totalAmount.ToString("0.00")</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                var forms = document.getElementsByClassName('needs-validation');
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+} 

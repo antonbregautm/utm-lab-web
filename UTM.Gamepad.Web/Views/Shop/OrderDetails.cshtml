@@ -1,0 +1,371 @@
+@model UTM.Gamepad.Domain.Order
+@{
+    ViewBag.Title = "Order Details";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold text-primary">
+                <i class="fas fa-file-invoice"></i> Order Details
+            </h2>
+            <p class="lead text-muted d-flex align-items-center">
+                Order #@Model.Id.ToString().Substring(0, 8)...
+                <span class="ms-3">
+                    @{
+                        string statusClass = "badge-secondary";
+                        string textClass = "text-secondary";
+                        switch (Model.Status)
+                        {
+                            case "Pending":
+                                statusClass = "bg-warning text-dark";
+                                textClass = "text-warning";
+                                break;
+                            case "Processing":
+                                statusClass = "bg-info text-white";
+                                textClass = "text-info";
+                                break;
+                            case "Shipped":
+                                statusClass = "bg-primary text-white";
+                                textClass = "text-primary";
+                                break;
+                            case "Completed":
+                                statusClass = "bg-success text-white";
+                                textClass = "text-success";
+                                break;
+                            case "Cancelled":
+                                statusClass = "bg-danger text-white";
+                                textClass = "text-danger";
+                                break;
+                        }
+                    }
+                    <span class="badge @statusClass rounded-pill px-3 py-2">@Model.Status</span>
+                </span>
+            </p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <a href="@Url.Action("MyOrders", "Shop")" class="btn btn-outline-primary rounded-pill">
+                <i class="fas fa-arrow-left me-2"></i> Back to My Orders
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="row">
+        <!-- Order Information -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-info-circle me-2 @textClass"></i> Order Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">Order Number</p>
+                        <p class="mb-0 fw-bold">@Model.Id</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">Order Date</p>
+                        <p class="mb-0 fw-bold">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">Payment Method</p>
+                        <p class="mb-0 fw-bold">@(string.IsNullOrEmpty(Model.PaymentMethod) ? "Credit Card" : Model.PaymentMethod)</p>
+                    </div>
+                    <div class="mb-0">
+                        <p class="mb-1 text-muted small text-uppercase">Total Amount</p>
+                        <p class="mb-0 fw-bold fs-4 @textClass">$@Model.TotalAmount.ToString("0.00")</p>
+                    </div>
+                </div>
+                @if (Model.Status == "Pending" || Model.Status == "Processing")
+                {
+                    <div class="card-footer bg-white border-top p-4">
+                        <a href="@Url.Action("CancelOrder", "Shop", new { id = Model.Id })" 
+                           class="btn btn-outline-danger w-100 rounded-pill"
+                           onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
+                            <i class="fas fa-times me-2"></i> Cancel Order
+                        </a>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Shipping Information -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-shipping-fast me-2 @textClass"></i> Shipping Information
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">Recipient</p>
+                        <p class="mb-0 fw-bold">@(User.Identity.IsAuthenticated ? User.Identity.Name : "Guest")</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">Address</p>
+                        <p class="mb-0 fw-bold">@(string.IsNullOrEmpty(Model.ShippingAddress) ? "Not specified" : Model.ShippingAddress)</p>
+                    </div>
+                    <div class="mb-4">
+                        <p class="mb-1 text-muted small text-uppercase">City, State, ZIP</p>
+                        <p class="mb-0 fw-bold">
+                            @(string.IsNullOrEmpty(Model.City) ? "Not specified" : Model.City), 
+                            @(string.IsNullOrEmpty(Model.State) ? "Not specified" : Model.State) 
+                            @(string.IsNullOrEmpty(Model.ZipCode) ? "" : Model.ZipCode)
+                        </p>
+                    </div>
+                    <div class="mb-0">
+                        <p class="mb-1 text-muted small text-uppercase">Country</p>
+                        <p class="mb-0 fw-bold">@(string.IsNullOrEmpty(Model.Country) ? "Not specified" : Model.Country)</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Order Status -->
+        <div class="col-md-4 mb-4">
+            <div class="card border-0 shadow-sm h-100 rounded-3 overflow-hidden">
+                <div class="card-header bg-white border-bottom p-4">
+                    <h5 class="mb-0 fw-bold">
+                        <i class="fas fa-tasks me-2 @textClass"></i> Order Progress
+                    </h5>
+                </div>
+                <div class="card-body p-4">
+                    <div class="order-timeline">
+                        <div class="timeline-item @(Model.Status != "Cancelled" ? "completed" : "")">
+                            <div class="timeline-marker @(Model.Status != "Cancelled" ? "bg-success" : "bg-secondary")"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Order Placed</h6>
+                                <p class="small text-muted mb-0">@Model.OrderDate.ToString("MMM dd, yyyy")</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item @(Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Completed" ? "completed" : "")">
+                            <div class="timeline-marker @(Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Completed" ? "bg-success" : "bg-secondary")"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Processing</h6>
+                                <p class="small text-muted mb-0">@(Model.Status == "Processing" || Model.Status == "Shipped" || Model.Status == "Completed" ? "In Progress" : "Waiting")</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item @(Model.Status == "Shipped" || Model.Status == "Completed" ? "completed" : "")">
+                            <div class="timeline-marker @(Model.Status == "Shipped" || Model.Status == "Completed" ? "bg-success" : "bg-secondary")"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Shipped</h6>
+                                <p class="small text-muted mb-0">@(Model.Status == "Shipped" || Model.Status == "Completed" ? "In Transit" : "Waiting")</p>
+                            </div>
+                        </div>
+                        
+                        <div class="timeline-item @(Model.Status == "Completed" ? "completed" : "")">
+                            <div class="timeline-marker @(Model.Status == "Completed" ? "bg-success" : "bg-secondary")"></div>
+                            <div class="timeline-content">
+                                <h6 class="mb-0">Delivered</h6>
+                                <p class="small text-muted mb-0">@(Model.Status == "Completed" ? "Completed" : "Waiting")</p>
+                            </div>
+                        </div>
+                        
+                        @if (Model.Status == "Cancelled")
+                        {
+                            <div class="timeline-item completed cancelled">
+                                <div class="timeline-marker bg-danger"></div>
+                                <div class="timeline-content">
+                                    <h6 class="mb-0 text-danger">Cancelled</h6>
+                                    <p class="small text-muted mb-0">Order Cancelled</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="card border-0 shadow-sm mb-4 rounded-3 overflow-hidden">
+        <div class="card-header bg-white border-bottom p-4">
+            <h5 class="mb-0 fw-bold">
+                <i class="fas fa-shopping-basket me-2 @textClass"></i> Order Items
+            </h5>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table align-middle mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th class="px-4 py-3">Product</th>
+                            <th class="py-3">Price</th>
+                            <th class="py-3">Quantity</th>
+                            <th class="text-end pe-4 py-3">Total</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.OrderItems)
+                        {
+                            <tr class="border-bottom">
+                                <td class="px-4 py-3">
+                                    <div class="d-flex align-items-center">
+                                        <div class="product-img-container me-3">
+                                            <img src="@(string.IsNullOrEmpty(item.ProductImageUrl) ? "/Content/images/default-product.jpg" : item.ProductImageUrl)" 
+                                                alt="@item.ProductName" class="product-img rounded shadow-sm" />
+                                        </div>
+                                        <div>
+                                            <h6 class="mb-0 fw-bold">@item.ProductName</h6>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td class="py-3">$@item.Price.ToString("0.00")</td>
+                                <td class="py-3">
+                                    <span class="badge bg-light text-dark rounded-pill px-3 py-2">@item.Quantity</span>
+                                </td>
+                                <td class="text-end pe-4 py-3 fw-bold">$@((item.Price * item.Quantity).ToString("0.00"))</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot class="border-top">
+                        <tr>
+                            <td colspan="3" class="text-end pe-3 py-3 text-muted">Subtotal:</td>
+                            <td class="text-end pe-4 py-3">$@Model.TotalAmount.ToString("0.00")</td>
+                        </tr>
+                        <tr>
+                            <td colspan="3" class="text-end pe-3 py-3 text-muted">Shipping:</td>
+                            <td class="text-end pe-4 py-3"><span class="badge bg-success rounded-pill px-3 py-2">Free</span></td>
+                        </tr>
+                        <tr class="bg-light">
+                            <td colspan="3" class="text-end pe-3 py-3 fw-bold">Total:</td>
+                            <td class="text-end pe-4 py-3 fw-bold fs-5 @textClass">$@Model.TotalAmount.ToString("0.00")</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white p-4 d-flex justify-content-between align-items-center">
+            <p class="mb-0 small text-muted">Thank you for your order!</p>
+            <button class="btn btn-outline-primary rounded-pill btn-print">
+                <i class="fas fa-print me-2"></i> Print Order
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+    .product-img {
+        width: 60px;
+        height: 60px;
+        object-fit: cover;
+        border: 1px solid #eee;
+    }
+    
+    .product-img-container {
+        width: 60px;
+        height: 60px;
+        overflow: hidden;
+    }
+    
+    .order-timeline {
+        position: relative;
+        padding-left: 20px;
+    }
+    
+    .timeline-item {
+        position: relative;
+        padding-bottom: 30px;
+    }
+    
+    .timeline-item:last-child {
+        padding-bottom: 0;
+    }
+    
+    .timeline-item::before {
+        content: '';
+        position: absolute;
+        left: 5px;
+        top: 15px;
+        bottom: 0;
+        width: 2px;
+        background-color: #e9ecef;
+    }
+    
+    .timeline-item:last-child::before {
+        display: none;
+    }
+    
+    .timeline-marker {
+        position: absolute;
+        left: 0;
+        top: 5px;
+        width: 12px;
+        height: 12px;
+        border-radius: 50%;
+        background-color: #adb5bd;
+        z-index: 1;
+    }
+    
+    .timeline-content {
+        padding-left: 20px;
+    }
+    
+    .timeline-item.completed .timeline-marker {
+        background-color: #28a745;
+    }
+    
+    .timeline-item.cancelled .timeline-marker {
+        background-color: #dc3545;
+    }
+    
+    /* Классы для печати (добавляются через JavaScript) */
+    .print-hidden {
+        display: none !important;
+    }
+    
+    .print-small-text {
+        font-size: 12pt;
+    }
+    
+    .print-visible-border {
+        border: 1px solid #ddd !important;
+        box-shadow: none !important;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Функция печати с добавлением классов для стилизации
+            $(".btn-print").click(function(e) {
+                e.preventDefault();
+                
+                // Добавить классы для печати
+                $(".btn, .alert").addClass("print-hidden");
+                $("body").addClass("print-small-text");
+                $(".card").addClass("print-visible-border");
+                
+                // Печать
+                window.print();
+                
+                // Убрать классы после печати
+                setTimeout(function() {
+                    $(".btn, .alert").removeClass("print-hidden");
+                    $("body").removeClass("print-small-text");
+                    $(".card").removeClass("print-visible-border");
+                }, 500);
+            });
+        });
+    </script>
+} 

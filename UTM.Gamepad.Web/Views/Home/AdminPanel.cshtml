@@ -1,0 +1,64 @@
+@{
+    ViewBag.Title = "Панель администратора";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+}
+
+<div class="container mt-5">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3>Панель администратора</h3>
+                </div>
+                <div class="card-body">
+                    <h5 class="card-title">Добро пожаловать, администратор!</h5>
+                    <p class="card-text">
+                        Эта панель доступна только для пользователей с правами администратора.
+                        Здесь вы можете управлять системой.
+                    </p>
+                    
+                    <div class="row mt-4">
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    Управление пользователями
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Пользователи</h5>
+                                    <p class="card-text">Управление учетными записями пользователей системы.</p>
+                                    <a href="#" class="btn btn-primary">Управление</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    Управление товарами
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Товары</h5>
+                                    <p class="card-text">Добавление, редактирование и удаление товаров.</p>
+                                    <a href="#" class="btn btn-primary">Управление</a>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4">
+                            <div class="card mb-4">
+                                <div class="card-header">
+                                    Управление заказами
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">Заказы</h5>
+                                    <p class="card-text">Просмотр и управление заказами пользователей.</p>
+                                    <a href="#" class="btn btn-primary">Управление</a>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div> 

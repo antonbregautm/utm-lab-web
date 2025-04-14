@@ -1,0 +1,300 @@
+@model List<UTM.Gamepad.Domain.Product>
+@{
+    ViewBag.Title = "Shop Catalog";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold text-primary">
+                <i class="fas fa-gamepad"></i> Gaming Products
+            </h2>
+            <p class="lead text-muted">Browse our latest products and find your next favorite game</p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <a href="@Url.Action("Cart", "Shop")" class="btn btn-primary btn-sm rounded-pill">
+                <i class="fas fa-shopping-cart me-2"></i> View Cart
+                @((Session["Cart"] as List<UTM.Gamepad.Domain.OrderItem>)?.Count ?? 0)
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <!-- Filter and Search Row -->
+    <div class="row mb-4">
+        <div class="col-lg-7 mb-3 mb-lg-0">
+            <div class="btn-group filter-buttons" role="group">
+                <button id="all-products" class="btn btn-outline-primary active rounded-start">
+                    <i class="fas fa-th-large me-1"></i> All
+                </button>
+                <button id="filter-console" class="btn btn-outline-primary">
+                    <i class="fas fa-gamepad me-1"></i> Consoles
+                </button>
+                <button id="filter-game" class="btn btn-outline-primary">
+                    <i class="fas fa-compact-disc me-1"></i> Games
+                </button>
+                <button id="filter-controller" class="btn btn-outline-primary">
+                    <i class="fas fa-mouse me-1"></i> Controllers
+                </button>
+                <button id="filter-accessory" class="btn btn-outline-primary rounded-end">
+                    <i class="fas fa-headset me-1"></i> Accessories
+                </button>
+            </div>
+        </div>
+        <div class="col-lg-5">
+            <div class="input-group">
+                <span class="input-group-text bg-white border-end-0">
+                    <i class="fas fa-search text-primary"></i>
+                </span>
+                <input type="text" id="search-products" class="form-control border-start-0" placeholder="Search products...">
+            </div>
+        </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div class="row g-4" id="products-container">
+        @if (Model != null && Model.Any())
+        {
+            foreach (var product in Model)
+            {
+                <div class="col-md-6 col-lg-4 mb-4 product-card" data-category="@product.Category.ToLower()">
+                    <div class="card h-100 border-0 shadow-sm hover-shadow transition-300">
+                        <div class="position-relative overflow-hidden">
+                            <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/Content/images/default-product.jpg" : product.ImageUrl)" 
+                                 class="card-img-top" alt="@product.Name" style="height: 220px; object-fit: cover;">
+                            <div class="position-absolute badge bg-primary rounded-pill" style="top: 15px; right: 15px; z-index: 2;">
+                                @product.Category
+                            </div>
+                            <div class="product-overlay">
+                                <div class="d-flex h-100 justify-content-center align-items-center">
+                                    <a href="@Url.Action("ProductDetails", "Shop", new { id = product.Id })" class="btn btn-light btn-sm rounded-circle mx-2">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    @if (product.StockQuantity > 0)
+                                    {
+                                        using (Html.BeginForm("AddToCart", "Shop", FormMethod.Post, new { @class = "d-inline" }))
+                                        {
+                                            <input type="hidden" name="productId" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-primary btn-sm rounded-circle mx-2">
+                                                <i class="fas fa-cart-plus"></i>
+                                            </button>
+                                        }
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body pt-4">
+                            <h5 class="card-title fw-bold mb-1 text-truncate">@product.Name</h5>
+                            <div class="mb-2">
+                                <span class="badge @(product.StockQuantity > 0 ? "bg-success" : "bg-danger") rounded-pill">
+                                    @(product.StockQuantity > 0 ? "In Stock" : "Out of Stock")
+                                </span>
+                                @if (product.StockQuantity > 0 && product.StockQuantity <= 5)
+                                {
+                                    <span class="badge bg-warning text-dark rounded-pill ms-1">
+                                        Only @product.StockQuantity left
+                                    </span>
+                                }
+                            </div>
+                            <p class="card-text text-muted small mb-3" style="height: 60px; overflow: hidden;">
+                                @(product.Description?.Length > 100 ? product.Description.Substring(0, 100) + "..." : product.Description)
+                            </p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <h5 class="text-primary fw-bold mb-0">$@product.Price.ToString("0.00")</h5>
+                                <div>
+                                    <a href="@Url.Action("ProductDetails", "Shop", new { id = product.Id })" class="btn btn-outline-secondary btn-sm">
+                                        Details
+                                    </a>
+                                    @if (product.StockQuantity > 0)
+                                    {
+                                        using (Html.BeginForm("AddToCart", "Shop", FormMethod.Post, new { @class = "d-inline ms-2" }))
+                                        {
+                                            <input type="hidden" name="productId" value="@product.Id" />
+                                            <input type="hidden" name="quantity" value="1" />
+                                            <button type="submit" class="btn btn-primary btn-sm">
+                                                <i class="fas fa-cart-plus me-1"></i> Add
+                                            </button>
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <button type="button" class="btn btn-secondary btn-sm ms-2" disabled>
+                                            Out of Stock
+                                        </button>
+                                    }
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <div class="col-12 text-center py-5">
+                <div class="text-muted">
+                    <i class="fas fa-box-open fa-4x mb-3 text-secondary"></i>
+                    <h4>No products found</h4>
+                    <p>We're working on adding new products to our catalog.</p>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+
+<style>
+    .hover-shadow {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-shadow:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1) !important;
+    }
+    
+    .transition-300 {
+        transition: all 0.3s ease;
+    }
+    
+    .product-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0,0,0,0.2);
+        opacity: 0;
+        transition: all 0.3s ease;
+        z-index: 1;
+    }
+    
+    .card:hover .product-overlay {
+        opacity: 1;
+    }
+    
+    .filter-buttons .btn {
+        border-radius: 0;
+    }
+    
+    .filter-buttons .btn:first-child {
+        border-top-left-radius: 0.25rem;
+        border-bottom-left-radius: 0.25rem;
+    }
+    
+    .filter-buttons .btn:last-child {
+        border-top-right-radius: 0.25rem;
+        border-bottom-right-radius: 0.25rem;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#search-products").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $(".product-card").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                
+                // Show "no results" message
+                if ($(".product-card:visible").length === 0) {
+                    if ($("#no-results").length === 0) {
+                        $("#products-container").append(
+                            '<div id="no-results" class="col-12 text-center py-5">' +
+                            '<div class="text-muted">' +
+                            '<i class="fas fa-search fa-4x mb-3 text-secondary"></i>' +
+                            '<h4>No products found</h4>' +
+                            '<p>We couldn\'t find any products matching "' + value + '"</p>' +
+                            '<button class="btn btn-outline-primary mt-3" id="clear-search">' +
+                            '<i class="fas fa-times me-1"></i> Clear Search</button>' +
+                            '</div></div>'
+                        );
+                    } else {
+                        $("#no-results").show();
+                    }
+                } else {
+                    $("#no-results").hide();
+                }
+            });
+            
+            // Clear search
+            $(document).on('click', '#clear-search', function() {
+                $("#search-products").val('');
+                $(".product-card").show();
+                $("#no-results").hide();
+            });
+            
+            // Category filter
+            $("#all-products").click(function() {
+                $(".product-card").show();
+                $(".filter-buttons .btn").removeClass("active");
+                $(this).addClass("active");
+                $("#no-results").hide();
+            });
+            
+            $("#filter-console").click(function() {
+                filterProductsByCategory("console");
+            });
+            
+            $("#filter-game").click(function() {
+                filterProductsByCategory("game");
+            });
+            
+            $("#filter-controller").click(function() {
+                filterProductsByCategory("controller");
+            });
+            
+            $("#filter-accessory").click(function() {
+                filterProductsByCategory("accessory");
+            });
+            
+            function filterProductsByCategory(category) {
+                $(".product-card").hide();
+                $(".product-card[data-category='" + category + "']").show();
+                $(".filter-buttons .btn").removeClass("active");
+                $("#filter-" + category).addClass("active");
+                
+                if ($(".product-card[data-category='" + category + "']").length === 0) {
+                    if ($("#no-results").length === 0) {
+                        $("#products-container").append(
+                            '<div id="no-results" class="col-12 text-center py-5">' +
+                            '<div class="text-muted">' +
+                            '<i class="fas fa-filter fa-4x mb-3 text-secondary"></i>' +
+                            '<h4>No products found</h4>' +
+                            '<p>We don\'t have any products in the "' + category + '" category yet.</p>' +
+                            '<button class="btn btn-outline-primary mt-3" id="show-all-products">' +
+                            '<i class="fas fa-th-large me-1"></i> Show All Products</button>' +
+                            '</div></div>'
+                        );
+                    } else {
+                        $("#no-results").show();
+                    }
+                } else {
+                    $("#no-results").hide();
+                }
+            }
+            
+            // Show all products button
+            $(document).on('click', '#show-all-products', function() {
+                $("#all-products").click();
+            });
+        });
+    </script>
+} 

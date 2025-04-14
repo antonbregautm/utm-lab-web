@@ -14,12 +14,74 @@
     <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
     
+    <!-- Font Awesome для иконок -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <!-- Подключение CSS напрямую -->
     <link rel="stylesheet" type="text/css" href="~/Content/css/style.css">
 
-    <!-- Внешние библиотеки -->
-    <link rel="stylesheet" href="https://netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/fancybox/2.1.5/jquery.fancybox.min.css">
+    <style>
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background-color: #007bff;
+            color: white;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 5px;
+        }
+        
+        .auth-buttons .nav-item {
+            margin-left: 5px;
+        }
+        
+        .auth-buttons .nav-link {
+            color: #555;
+            display: flex;
+            align-items: center;
+        }
+        
+        .auth-buttons .nav-link i {
+            margin-right: 5px;
+            font-size: 16px;
+        }
+        
+        .auth-buttons .nav-link:hover {
+            color: #007bff;
+        }
+        
+        .dropdown-menu {
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            border: none;
+            padding: 8px 0;
+        }
+        
+        .dropdown-menu a {
+            padding: 8px 16px;
+            color: #333;
+            transition: background-color 0.2s;
+        }
+        
+        .dropdown-menu a:hover {
+            background-color: #f8f9fa;
+            color: #007bff;
+        }
+        
+        .user-dropdown .dropdown-toggle {
+            display: flex;
+            align-items: center;
+        }
+        
+        .dropdown-divider {
+            height: 0;
+            margin: 0.5rem 0;
+            overflow: hidden;
+            border-top: 1px solid #e9ecef;
+        }
+    </style>
 </head>
 <body>
 
@@ -41,21 +103,111 @@
             <!-- главное меню -->
             <ul class="navbar-nav mr-auto">
                 <!-- ссылки на страницы -->
-                <li class="nav-item">@Html.ActionLink("Home", "Index", "Home", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("About", "About", "Home", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("Products", "Product", "Home", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("Video Games", "Video", "Home", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("Remote Control", "Remote", "Home", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("Contact", "Contact", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Главная", "Index", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("О нас", "About", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Магазин", "Catalog", "Shop", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Товары", "Product", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Видеоигры", "Video", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Контроллеры", "Remote", "Home", null, new { @class = "nav-link" })</li>
+                <li class="nav-item">@Html.ActionLink("Контакты", "Contact", "Home", null, new { @class = "nav-link" })</li>
+
+                @{
+                    bool isAdmin = false;
+                    if (User.Identity.IsAuthenticated)
+                    {
+                        try 
+                        {
+                            isAdmin = User.IsInRole("Admin");
+                        }
+                        catch (Exception ex)
+                        {
+                            <!-- Ошибка при проверке роли -->
+                        }
+                    }
+                }
+
+                @if (User.Identity.IsAuthenticated && isAdmin)
+                {
+                    <li class="nav-item dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <i class="fas fa-shield-alt"></i> Администрирование <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt"></i> Панель администратора</a></li>
+                            <li><a href="@Url.Action("UserList", "Admin")"><i class="fas fa-users-cog"></i> Управление пользователями</a></li>
+                        </ul>
+                    </li>
+                }
 
                 <!-- иконка поиска -->
                 <li class="nav-item">
                     <a class="nav-link" href="#"><img src="~/Content/images/search-icon.png" /></a>
                 </li>
+            </ul>
 
-                <!-- ссылки для входа и регистрации -->
-                <li class="nav-item">@Html.ActionLink("Sign In", "Login", "Account", null, new { @class = "nav-link" })</li>
-                <li class="nav-item">@Html.ActionLink("Register", "Register", "Account", null, new { @class = "nav-link" })</li>
+            <!-- Кнопки авторизации -->
+            <ul class="navbar-nav auth-buttons">
+                @if (Request.IsAuthenticated)
+                {
+                    <li class="nav-item dropdown user-dropdown">
+                        <a href="#" class="nav-link dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">
+                            <div class="user-avatar">
+                                <i class="fas fa-user"></i>
+                            </div>
+                            @User.Identity.Name <span class="caret"></span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-right">
+                            <!-- Отладочная информация о роли -->
+                            <li><span class="px-4 text-info">Роль: @(isAdmin ? "Админ" : "Не админ")</span></li>
+                            <li role="separator" class="dropdown-divider"></li>
+                            
+                            @if (isAdmin)
+                            {
+                                <li><a href="@Url.Action("Index", "Admin")"><i class="fas fa-tachometer-alt"></i> Панель администратора</a></li>
+                                <li><a href="@Url.Action("UserList", "Admin")"><i class="fas fa-users-cog"></i> Управление пользователями</a></li>
+                                <li><a href="@Url.Action("Index", "Products", new { area = "Admin" })"><i class="fas fa-gamepad"></i> Управление играми</a></li>
+                                <li><a href="@Url.Action("Index", "Orders", new { area = "Admin" })"><i class="fas fa-shopping-basket"></i> Управление заказами</a></li>
+                                <li role="separator" class="dropdown-divider"></li>
+                            }
+                            @{
+                                bool isModerator = false;
+                                if (User.Identity.IsAuthenticated)
+                                {
+                                    try 
+                                    {
+                                        isModerator = User.IsInRole("Moderator");
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        <!-- Ошибка при проверке роли -->
+                                    }
+                                }
+                            }
+                            @if (isModerator)
+                            {
+                                <li><a href="@Url.Action("Index", "Reviews", new { area = "Moderator" })"><i class="fas fa-star"></i> Модерация отзывов</a></li>
+                                <li><a href="@Url.Action("Index", "Content", new { area = "Moderator" })"><i class="fas fa-edit"></i> Управление контентом</a></li>
+                                <li role="separator" class="dropdown-divider"></li>
+                            }
+                            <li><a href="@Url.Action("Profile", "UserAccount")"><i class="fas fa-user-circle"></i> Профиль</a></li>
+                            <li><a href="@Url.Action("MyOrders", "Shop")"><i class="fas fa-shopping-cart"></i> Мои заказы</a></li>
+                            <li><a href="@Url.Action("SignOut", "UserAccount")"><i class="fas fa-sign-out-alt"></i> Выйти</a></li>
+                        </ul>
+                    </li>
+                }
+                else
+                {
+                    <li class="nav-item">
+                        <a href="@Url.Action("SignIn", "UserAccount")" class="nav-link">
+                            <i class="fas fa-sign-in-alt"></i> Вход
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="@Url.Action("SignUp", "UserAccount")" class="nav-link">
+                            <i class="fas fa-user-plus"></i> Регистрация
+                        </a>
+                    </li>
+                }
             </ul>
         </div>
     </nav>
@@ -63,6 +215,18 @@
 <!-- конец шапки -->
 
 <!-- здесь будет загружаться содержимое страниц -->
+@if (Request.IsAuthenticated)
+{
+    <div class="container mt-2">
+        <div class="alert alert-info">
+            <strong>Отладка:</strong> 
+            <span>Пользователь: <strong>@User.Identity.Name</strong></span> | 
+            <span>Роль из User.IsInRole("Admin"): <strong>@isAdmin</strong></span> | 
+            <span>Роль из TempData["UserRole"]: <strong>@(TempData["UserRole"]?.ToString() ?? "Не установлено")</strong></span> | 
+            <span>Роль из CustomRoleProvider: <strong>@(System.Web.Security.Roles.GetRolesForUser(User.Identity.Name).FirstOrDefault() ?? "Не определена")</strong></span>
+        </div>
+    </div>
+}
 @RenderBody()
 
 <!-- 🔹 Подвал сайта -->

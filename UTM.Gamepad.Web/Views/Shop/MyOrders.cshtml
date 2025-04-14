@@ -1,0 +1,223 @@
+@model List<UTM.Gamepad.Domain.Order>
+@{
+    ViewBag.Title = "My Orders";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="display-5 fw-bold text-primary">
+                <i class="fas fa-shopping-bag"></i> My Orders
+            </h2>
+            <p class="lead text-muted">Track your order history and check order statuses</p>
+        </div>
+        <div class="col-md-4 d-flex justify-content-end align-items-center">
+            <a href="@Url.Action("Catalog", "Shop")" class="btn btn-primary rounded-pill">
+                <i class="fas fa-shopping-cart me-2"></i> Continue Shopping
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-exclamation-circle me-2"></i> @TempData["ErrorMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm rounded-3 overflow-hidden">
+        <div class="card-header bg-white p-4 border-bottom">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h5 class="mb-0 fw-bold text-primary">
+                        <i class="fas fa-history me-2"></i> Order History
+                    </h5>
+                </div>
+                <div class="col-md-6">
+                    <div class="input-group">
+                        <span class="input-group-text bg-white border-end-0">
+                            <i class="fas fa-search text-primary"></i>
+                        </span>
+                        <input type="text" id="orderSearch" class="form-control border-start-0" placeholder="Search orders...">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            @if (Model != null && Model.Any())
+            {
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th class="px-4">Order #</th>
+                                <th>Date</th>
+                                <th>Status</th>
+                                <th>Total</th>
+                                <th class="text-center">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="orderTableBody">
+                            @foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                            {
+                                <tr class="order-row border-bottom">
+                                    <td class="px-4">
+                                        <a href="@Url.Action("OrderDetails", "Shop", new { id = order.Id })" class="text-primary fw-bold text-decoration-none">
+                                            #@order.Id.ToString().Substring(0, 8)...
+                                        </a>
+                                    </td>
+                                    <td class="text-muted">@order.OrderDate.ToString("MMM dd, yyyy")</td>
+                                    <td>
+                                        @{
+                                            string statusClass = "badge-secondary";
+                                            string statusBg = "bg-secondary";
+                                            switch (order.Status)
+                                            {
+                                                case "Pending":
+                                                    statusClass = "bg-warning text-dark";
+                                                    statusBg = "bg-warning bg-opacity-10 text-warning";
+                                                    break;
+                                                case "Processing":
+                                                    statusClass = "bg-info text-white";
+                                                    statusBg = "bg-info bg-opacity-10 text-info";
+                                                    break;
+                                                case "Shipped":
+                                                    statusClass = "bg-primary text-white";
+                                                    statusBg = "bg-primary bg-opacity-10 text-primary";
+                                                    break;
+                                                case "Completed":
+                                                    statusClass = "bg-success text-white";
+                                                    statusBg = "bg-success bg-opacity-10 text-success";
+                                                    break;
+                                                case "Cancelled":
+                                                    statusClass = "bg-danger text-white";
+                                                    statusBg = "bg-danger bg-opacity-10 text-danger";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="badge @statusClass rounded-pill px-3 py-2">@order.Status</span>
+                                    </td>
+                                    <td class="fw-bold">$@order.TotalAmount.ToString("0.00")</td>
+                                    <td class="text-center">
+                                        <a href="@Url.Action("OrderDetails", "Shop", new { id = order.Id })" class="btn btn-sm btn-outline-primary rounded-pill me-1">
+                                            <i class="fas fa-eye me-1"></i> View Details
+                                        </a>
+                                        @if (order.Status == "Pending" || order.Status == "Processing")
+                                        {
+                                            <a href="@Url.Action("CancelOrder", "Shop", new { id = order.Id })" 
+                                               class="btn btn-sm btn-outline-danger rounded-pill"
+                                               onclick="return confirm('Are you sure you want to cancel this order? This action cannot be undone.');">
+                                                <i class="fas fa-times me-1"></i> Cancel
+                                            </a>
+                                        }
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+            else
+            {
+                <div class="text-center py-5">
+                    <div class="empty-state">
+                        <div class="empty-state-icon bg-light mb-4">
+                            <i class="fas fa-shopping-bag text-secondary"></i>
+                        </div>
+                        <h4 class="mb-3">No Orders Yet</h4>
+                        <p class="text-muted mb-4">You haven't placed any orders yet.<br>Start shopping to add items to your cart.</p>
+                        <a href="@Url.Action("Catalog", "Shop")" class="btn btn-primary rounded-pill px-4">
+                            <i class="fas fa-shopping-cart me-2"></i> Start Shopping
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+<style>
+    .empty-state {
+        padding: 40px 20px;
+    }
+    
+    .empty-state-icon {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+    }
+    
+    .empty-state-icon i {
+        font-size: 32px;
+    }
+    
+    .order-row {
+        transition: all 0.2s ease;
+    }
+    
+    .order-row:hover {
+        background-color: rgba(0,0,0,0.02);
+    }
+    
+    .table th {
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 12px;
+        letter-spacing: 0.5px;
+    }
+</style>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#orderSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#orderTableBody tr.order-row").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1);
+                });
+                
+                // Show no results message
+                if ($("#orderTableBody tr.order-row:visible").length === 0 && value !== "") {
+                    if ($("#no-results-row").length === 0) {
+                        $("#orderTableBody").append(
+                            '<tr id="no-results-row" class="border-0">' +
+                            '<td colspan="5" class="text-center py-5">' +
+                            '<div class="empty-state">' +
+                            '<div class="empty-state-icon bg-light mb-4">' +
+                            '<i class="fas fa-search text-secondary"></i>' +
+                            '</div>' +
+                            '<h4 class="mb-3">No Results Found</h4>' +
+                            '<p class="text-muted mb-4">We couldn\'t find any orders matching "' + value + '"</p>' +
+                            '<button id="clear-search" class="btn btn-outline-primary rounded-pill px-4">' +
+                            '<i class="fas fa-times me-2"></i>Clear Search</button>' +
+                            '</div>' +
+                            '</td></tr>'
+                        );
+                    } else {
+                        $("#no-results-row").show();
+                    }
+                } else {
+                    $("#no-results-row").hide();
+                }
+            });
+            
+            // Clear search
+            $(document).on('click', '#clear-search', function() {
+                $("#orderSearch").val('').trigger('keyup');
+            });
+        });
+    </script>
+} 

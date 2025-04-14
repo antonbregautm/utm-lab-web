@@ -1,0 +1,133 @@
+@model UTM.Gamepad.Domain.Product
+@{
+    ViewBag.Title = "Product Details";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-info-circle"></i> Product Details
+            </h2>
+            <p class="lead text-muted">Detailed information about this product</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Catalog", "Shop")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Catalog
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show shadow-sm rounded-3" role="alert">
+            <i class="fas fa-check-circle me-2"></i> @TempData["SuccessMessage"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="card border-0 shadow-sm overflow-hidden">
+        <div class="row g-0">
+            <div class="col-md-5">
+                <div class="position-relative" style="height: 100%;">
+                    <img src="@(string.IsNullOrEmpty(Model.ImageUrl) ? "/Content/images/default-product.jpg" : Model.ImageUrl)" 
+                         class="img-fluid rounded-start" alt="@Model.Name" style="width: 100%; height: 100%; object-fit: cover; max-height: 500px;">
+                    <div class="position-absolute badge bg-primary rounded-pill" style="top: 15px; left: 15px; z-index: 2;">
+                        @Model.Category
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-7">
+                <div class="card-body p-4 p-xl-5">
+                    <h1 class="card-title display-6 fw-bold mb-3">@Model.Name</h1>
+                    
+                    <div class="mb-4">
+                        <span class="badge @(Model.StockQuantity > 0 ? "bg-success" : "bg-danger") rounded-pill px-3 py-2 fs-6">
+                            @(Model.StockQuantity > 0 ? "In Stock" : "Out of Stock")
+                        </span>
+                        
+                        @if (Model.StockQuantity > 0 && Model.StockQuantity <= 5)
+                        {
+                            <span class="badge bg-warning text-dark rounded-pill px-3 py-2 fs-6 ms-2">
+                                Only @Model.StockQuantity left
+                            </span>
+                        }
+                    </div>
+                    
+                    <h3 class="text-primary fw-bold mb-4">$@Model.Price.ToString("0.00")</h3>
+                    
+                    <p class="card-text fs-5 mb-4">@Model.Description</p>
+                    
+                    <hr class="my-4">
+                    
+                    <div class="d-flex flex-wrap">
+                        @if (Model.StockQuantity > 0)
+                        {
+                            using (Html.BeginForm("AddToCart", "Shop", FormMethod.Post, new { @class = "mb-3" }))
+                            {
+                                <input type="hidden" name="productId" value="@Model.Id" />
+                                <div class="d-flex align-items-center">
+                                    <div class="input-group me-3" style="width: 120px;">
+                                        <span class="input-group-text bg-light border">Qty</span>
+                                        <input type="number" name="quantity" min="1" max="@Model.StockQuantity" value="1" class="form-control">
+                                    </div>
+                                    <button type="submit" class="btn btn-primary btn-lg">
+                                        <i class="fas fa-cart-plus me-2"></i> Add to Cart
+                                    </button>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <button type="button" class="btn btn-secondary btn-lg mb-3" disabled>
+                                <i class="fas fa-times-circle me-2"></i> Out of Stock
+                            </button>
+                        }
+                    </div>
+                    
+                    <div class="mt-4">
+                        <h5 class="text-muted mb-3">Product Details</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light px-0">
+                                <span>Product ID</span>
+                                <span class="text-muted">@Model.Id</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light px-0">
+                                <span>Category</span>
+                                <span class="text-muted">@Model.Category</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between align-items-center bg-light px-0">
+                                <span>Availability</span>
+                                <span class="text-muted">@Model.StockQuantity in stock</span>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Handle quantity controls
+            $('.btn-quantity').on('click', function(e) {
+                e.preventDefault();
+                const input = $(this).siblings('input[name="quantity"]');
+                const currentVal = parseInt(input.val());
+                const maxVal = parseInt(input.attr('max'));
+                
+                if ($(this).hasClass('btn-quantity-plus')) {
+                    if (currentVal < maxVal) {
+                        input.val(currentVal + 1);
+                    }
+                } else {
+                    if (currentVal > 1) {
+                        input.val(currentVal - 1);
+                    }
+                }
+            });
+        });
+    </script>
+} 
