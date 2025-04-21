@@ -116,7 +116,11 @@
         <Compile Include="App_Start\BundleConfig.cs"/>
         <Compile Include="App_Start\FilterConfig.cs"/>
         <Compile Include="App_Start\RouteConfig.cs"/>
+        <Compile Include="App_Start\CustomRoleProvider.cs"/>
+        <Compile Include="Controllers\AdminController.cs"/>
         <Compile Include="Controllers\HomeController.cs"/>
+        <Compile Include="Controllers\ShopController.cs" />
+        <Compile Include="Controllers\UserAccountController.cs" />
         <Compile Include="Global.asax.cs">
             <DependentUpon>Global.asax</DependentUpon>
         </Compile>
@@ -197,9 +201,32 @@
         <Content Include="Scripts\jquery.validate.unobtrusive.js"/>
         <Content Include="Scripts\jquery.validate.unobtrusive.min.js"/>
         <Content Include="Scripts\modernizr-2.8.3.js"/>
+        <Content Include="Views\Admin\CreateProduct.cshtml" />
+        <Content Include="Views\Admin\CreateUser.cshtml" />
+        <Content Include="Views\Admin\EditProduct.cshtml" />
+        <Content Include="Views\Admin\OrderDetails.cshtml" />
+        <Content Include="Views\Admin\Orders.cshtml" />
+        <Content Include="Views\Admin\Products.cshtml" />
+        <Content Include="Views\Admin\Statistics.cshtml" />
+        <Content Include="Views\Home\AdminPanel.cshtml" />
         <Content Include="Views\Home\Product.cshtml" />
         <Content Include="Views\Home\Remote.cshtml" />
         <Content Include="Views\Home\Video.cshtml" />
+        <Content Include="Views\Home\CreateAdmin.cshtml" />
+        <Content Include="Views\Shop\Cart.cshtml" />
+        <Content Include="Views\Shop\Catalog.cshtml" />
+        <Content Include="Views\Shop\Checkout.cshtml" />
+        <Content Include="Views\Shop\MyOrders.cshtml" />
+        <Content Include="Views\Shop\OrderConfirmation.cshtml" />
+        <Content Include="Views\Shop\OrderDetails.cshtml" />
+        <Content Include="Views\Shop\ProductDetails.cshtml" />
+        <Content Include="Views\UserAccount\Profile.cshtml" />
+        <Content Include="Views\UserAccount\SignIn.cshtml" />
+        <Content Include="Views\UserAccount\SignUp.cshtml" />
+        <Content Include="Views\Admin\Index.cshtml" />
+        <Content Include="Views\Admin\UserList.cshtml" />
+        <Content Include="Views\Admin\EditUser.cshtml" />
+        <Content Include="Views\Admin\ResetPassword.cshtml" />
         <Content Include="Web.config"/>
         <Content Include="Web.Debug.config">
             <DependentUpon>Web.config</DependentUpon>
@@ -218,6 +245,7 @@
     <ItemGroup>
         <Folder Include="App_Data"/>
         <Folder Include="Models"/>
+        <Folder Include="Views\Account\" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="fonts\glyphicons-halflings-regular.woff2"/>
@@ -227,6 +255,20 @@
         <None Include="packages.config"/>
         <Content Include="Scripts\jquery-3.3.1.slim.min.map"/>
         <Content Include="Scripts\jquery-3.3.1.min.map"/>
+    </ItemGroup>
+    <ItemGroup>
+      <ProjectReference Include="..\UTM.Gamepad.Application\UTM.Gamepad.Application.csproj">
+        <Project>{7682e787-7e29-4722-9827-d4d783b25321}</Project>
+        <Name>UTM.Gamepad.Application</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj">
+        <Project>{e4fdb5f5-572b-47f8-9110-49646dd80b4a}</Project>
+        <Name>UTM.Gamepad.Domain</Name>
+      </ProjectReference>
+      <ProjectReference Include="..\UTM.Gamepad.Infrastructure\UTM.Gamepad.Infrastructure.csproj">
+        <Project>{b9f0bcce-8783-43d3-8822-1ac3d38019a9}</Project>
+        <Name>UTM.Gamepad.Infrastructure</Name>
+      </ProjectReference>
     </ItemGroup>
     <PropertyGroup>
         <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>
