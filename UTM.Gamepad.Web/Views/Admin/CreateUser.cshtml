@@ -1,0 +1,123 @@
+@{
+    ViewBag.Title = "Create New User";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-user-plus"></i> Create New User
+            </h2>
+            <p class="lead text-muted">Add a new user to the system</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="@Url.Action("UserList", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to User List
+            </a>
+        </div>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @ViewBag.ErrorMessage
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">User Information</h5>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("CreateUser", "Admin", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+            {
+                @Html.AntiForgeryToken()
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="fullName"><i class="fas fa-user"></i> Full Name</label>
+                        <input type="text" class="form-control" id="fullName" name="fullName" placeholder="Enter full name" required>
+                        <div class="invalid-feedback">Please enter the user's full name.</div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="email"><i class="fas fa-envelope"></i> Email</label>
+                        <input type="email" class="form-control" id="email" name="email" placeholder="Enter email address" required>
+                        <div class="invalid-feedback">Please enter a valid email address.</div>
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-group col-md-6">
+                        <label for="password"><i class="fas fa-lock"></i> Password</label>
+                        <input type="password" class="form-control" id="password" name="password" placeholder="Enter password" required>
+                        <div class="invalid-feedback">Please enter a password.</div>
+                    </div>
+                    <div class="form-group col-md-6">
+                        <label for="confirmPassword"><i class="fas fa-lock"></i> Confirm Password</label>
+                        <input type="password" class="form-control" id="confirmPassword" name="confirmPassword" placeholder="Confirm password" required>
+                        <div class="invalid-feedback">Please confirm the password.</div>
+                        <div id="passwordMatch" class="text-danger mt-1 d-none">Passwords do not match.</div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="roleId"><i class="fas fa-user-tag"></i> Role</label>
+                    @Html.DropDownList("roleId", ViewBag.Roles as SelectList, "Select Role", new { @class = "form-control", required = "required" })
+                    <div class="invalid-feedback">Please select a role for this user.</div>
+                </div>
+                <div class="form-group mt-4 border-top pt-4">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Create User
+                    </button>
+                    <a href="@Url.Action("UserList", "Admin")" class="btn btn-outline-secondary ml-2">
+                        <i class="fas fa-times"></i> Cancel
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation
+        (function() {
+            'use strict';
+            window.addEventListener('load', function() {
+                // Fetch all the forms we want to apply custom Bootstrap validation styles to
+                var forms = document.getElementsByClassName('needs-validation');
+                
+                // Check password match
+                var password = document.getElementById('password');
+                var confirmPassword = document.getElementById('confirmPassword');
+                var passwordMatch = document.getElementById('passwordMatch');
+                
+                confirmPassword.addEventListener('keyup', function() {
+                    if (password.value !== confirmPassword.value) {
+                        passwordMatch.classList.remove('d-none');
+                    } else {
+                        passwordMatch.classList.add('d-none');
+                    }
+                });
+                
+                // Loop over them and prevent submission
+                var validation = Array.prototype.filter.call(forms, function(form) {
+                    form.addEventListener('submit', function(event) {
+                        if (password.value !== confirmPassword.value) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                            passwordMatch.classList.remove('d-none');
+                        }
+                        
+                        if (form.checkValidity() === false) {
+                            event.preventDefault();
+                            event.stopPropagation();
+                        }
+                        
+                        form.classList.add('was-validated');
+                    }, false);
+                });
+            }, false);
+        })();
+    </script>
+} 

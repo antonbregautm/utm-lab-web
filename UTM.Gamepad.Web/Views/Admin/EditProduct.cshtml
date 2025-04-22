@@ -1,0 +1,146 @@
+@model UTM.Gamepad.Domain.Product
+
+@{
+    ViewBag.Title = "Edit Product";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">Edit Product</h5>
+                        <p class="text-sm mb-0">Update product information</p>
+                    </div>
+                    <a href="@Url.Action("Products", "Admin")" class="btn btn-primary btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Products
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @using (Html.BeginForm("EditProduct", "Admin", FormMethod.Post, new { enctype = "multipart/form-data", id = "editProductForm" }))
+                    {
+                        @Html.AntiForgeryToken()
+                        @Html.HiddenFor(m => m.Id)
+                        
+                        <div class="row">
+                            <div class="col-md-8">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Product Name <span class="text-danger">*</span></label>
+                                            @Html.TextBoxFor(m => m.Name, new { @class = "form-control", required = "required" })
+                                            @Html.ValidationMessageFor(m => m.Name, "", new { @class = "text-danger" })
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Description <span class="text-danger">*</span></label>
+                                            @Html.TextAreaFor(m => m.Description, new { @class = "form-control", rows = "5", required = "required" })
+                                            @Html.ValidationMessageFor(m => m.Description, "", new { @class = "text-danger" })
+                                        </div>
+                                        
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Price ($) <span class="text-danger">*</span></label>
+                                                    @Html.TextBoxFor(m => m.Price, "{0:F2}", new { @class = "form-control", type = "number", step = "0.01", min = "0.01", required = "required" })
+                                                    @Html.ValidationMessageFor(m => m.Price, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="mb-3">
+                                                    <label class="form-label">Stock Quantity <span class="text-danger">*</span></label>
+                                                    @Html.TextBoxFor(m => m.StockQuantity, new { @class = "form-control", type = "number", min = "0", required = "required" })
+                                                    @Html.ValidationMessageFor(m => m.StockQuantity, "", new { @class = "text-danger" })
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <div class="mb-3">
+                                            <label class="form-label">Category <span class="text-danger">*</span></label>
+                                            @Html.DropDownListFor(m => m.Category, new SelectList(new[]
+                                            {
+                                                "Console", "Game", "Controller", "Accessory"
+                                            }, Model.Category), "Select Category", new { @class = "form-select", required = "required" })
+                                            @Html.ValidationMessageFor(m => m.Category, "", new { @class = "text-danger" })
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="col-md-4">
+                                <div class="card">
+                                    <div class="card-body">
+                                        <div class="mb-3">
+                                            <label class="form-label">Product Image</label>
+                                            <div class="mb-3">
+                                                @if (!string.IsNullOrEmpty(Model.ImageUrl))
+                                                {
+                                                    <div class="mb-3 text-center">
+                                                        <img src="@Model.ImageUrl" alt="@Model.Name" class="img-fluid rounded" style="max-height: 200px;">
+                                                    </div>
+                                                }
+                                                <input type="file" class="form-control" name="ProductImage" id="ProductImage" accept="image/*">
+                                                <small class="form-text text-muted">Leave empty to keep current image</small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="row mt-4">
+                            <div class="col-12 text-end">
+                                <a href="@Url.Action("Products", "Admin")" class="btn btn-outline-secondary me-2">Cancel</a>
+                                <button type="submit" class="btn btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+        $(document).ready(function() {
+            // Image preview
+            $('#ProductImage').change(function() {
+                if (this.files && this.files[0]) {
+                    var reader = new FileReader();
+                    reader.onload = function(e) {
+                        // If there is an existing image, replace it
+                        if ($('img').length) {
+                            $('img').attr('src', e.target.result);
+                        } else {
+                            // Create new image element if none exists
+                            var img = $('<img class="img-fluid rounded mb-3" style="max-height: 200px;">');
+                            img.attr('src', e.target.result);
+                            $('#ProductImage').before('<div class="mb-3 text-center"></div>');
+                            $('#ProductImage').prev().append(img);
+                        }
+                    }
+                    reader.readAsDataURL(this.files[0]);
+                }
+            });
+            
+            // Form validation
+            $('#editProductForm').submit(function(event) {
+                var form = $(this);
+                if (form[0].checkValidity() === false) {
+                    event.preventDefault();
+                    event.stopPropagation();
+                }
+                form.addClass('was-validated');
+            });
+        });
+    </script>

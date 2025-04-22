@@ -1,0 +1,121 @@
+@model UTM.Gamepad.Domain.User
+@{
+    ViewBag.Title = "Edit User";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-user-edit"></i> Edit User
+            </h2>
+            <p class="lead text-muted">Change user information and role in the system</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="@Url.Action("UserList", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Users List
+            </a>
+        </div>
+    </div>
+
+    @if (ViewBag.ErrorMessage != null)
+    {
+        <div class="alert alert-danger" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @ViewBag.ErrorMessage
+        </div>
+    }
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">User Information</h5>
+        </div>
+        <div class="card-body">
+            @using (Html.BeginForm("EditUser", "Admin", FormMethod.Post, new { @class = "needs-validation", novalidate = "novalidate" }))
+            {
+                @Html.AntiForgeryToken()
+                @Html.HiddenFor(m => m.Id)
+
+                <div class="form-group">
+                    <label for="FullName"><i class="fas fa-user"></i> Full Name</label>
+                    @Html.TextBoxFor(m => m.FullName, new { @class = "form-control", placeholder = "Enter full name", required = "required" })
+                    <div class="invalid-feedback">Please enter a valid full name.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="Email"><i class="fas fa-envelope"></i> Email</label>
+                    @Html.TextBoxFor(m => m.Email, new { @class = "form-control", placeholder = "Enter email address", type = "email", required = "required" })
+                    <div class="invalid-feedback">Please enter a valid email address.</div>
+                </div>
+
+                <div class="form-group">
+                    <label for="RoleId"><i class="fas fa-user-shield"></i> Role</label>
+                    @Html.DropDownList("RoleId", ViewBag.Roles as SelectList, new { @class = "form-control custom-select" })
+                </div>
+
+                <div class="d-flex justify-content-between align-items-center">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Save Changes
+                    </button>
+                    <a href="@Url.Action("ResetPassword", "Admin", new { id = Model.Id })" class="btn btn-warning">
+                        <i class="fas fa-key"></i> Reset Password
+                    </a>
+                </div>
+            }
+        </div>
+    </div>
+
+    <div class="mt-4">
+        <div class="card shadow-sm">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">User Information</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>User ID:</strong> <span class="text-muted">@Model.Id</span></p>
+                        @if (Model.Role != null)
+                        {
+                            <p>
+                                <strong>Current Role:</strong>
+                                <span class="badge badge-pill @(Model.Role.Name == "Admin" ? "badge-danger" : "badge-info")">
+                                    @Model.Role.Name
+                                </span>
+                            </p>
+                        }
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Recent Activity:</strong> <span class="text-muted">No recent activity</span></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        // Form validation
+        (function() {
+          'use strict';
+          window.addEventListener('load', function() {
+            var forms = document.getElementsByClassName('needs-validation');
+            var validation = Array.prototype.filter.call(forms, function(form) {
+              form.addEventListener('submit', function(event) {
+                if (form.checkValidity() === false) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                }
+                form.classList.add('was-validated');
+              }, false);
+            });
+          }, false);
+        })();
+    </script>
+} 

@@ -1,0 +1,123 @@
+@{
+    ViewBag.Title = "Admin Panel";
+}
+
+<div class="container py-5">
+    <div class="row">
+        <div class="col-12">
+            <h2 class="text-primary mb-4">
+                <i class="fas fa-user-shield"></i> Admin Panel
+            </h2>
+            <p class="lead text-muted mb-5">Welcome to the administration area. Select a task below.</p>
+        </div>
+    </div>
+    
+    <div class="row">
+        <!-- User Management -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-primary"><i class="fas fa-users"></i> User Management</h5>
+                    <p class="card-text">Manage user accounts, reset passwords, and define user roles.</p>
+                    <div class="mt-auto">
+                        <a href="@Url.Action("UserList", "Admin")" class="btn btn-outline-primary mr-2">
+                            <i class="fas fa-list"></i> User List
+                        </a>
+                        <a href="@Url.Action("CreateUser", "Admin")" class="btn btn-outline-success">
+                            <i class="fas fa-user-plus"></i> Create User
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Product Management -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-primary"><i class="fas fa-gamepad"></i> Product Management</h5>
+                    <p class="card-text">Manage products, update inventory, and add new items to the store.</p>
+                    <div class="mt-auto">
+                        <a href="@Url.Action("Products", "Admin")" class="btn btn-outline-primary mr-2">
+                            <i class="fas fa-list"></i> Product List
+                        </a>
+                        <a href="@Url.Action("CreateProduct", "Admin")" class="btn btn-outline-success">
+                            <i class="fas fa-plus-circle"></i> Add Product
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Order Management -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body d-flex flex-column">
+                    <h5 class="card-title text-primary"><i class="fas fa-shopping-cart"></i> Order Management</h5>
+                    <p class="card-text">View and manage customer orders, update order status, and process returns.</p>
+                    <div class="mt-auto">
+                        <a href="@Url.Action("Orders", "Admin")" class="btn btn-outline-primary">
+                            <i class="fas fa-clipboard-list"></i> View Orders
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mt-4">
+        <!-- Site Statistics -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-chart-bar"></i> Site Statistics</h5>
+                    <p class="card-text">View site analytics, sales reports, and user engagement metrics.</p>
+                    <a href="@Url.Action("Statistics", "Admin")" class="btn btn-outline-primary">
+                        <i class="fas fa-chart-line"></i> View Statistics
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Site Configuration -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title text-primary"><i class="fas fa-cogs"></i> Site Configuration</h5>
+                    <p class="card-text">Configure site settings, payment methods, and shipping options.</p>
+                    <a href="#" class="btn btn-outline-primary">
+                        <i class="fas fa-sliders-h"></i> Site Settings
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Return to Site -->
+        <div class="col-md-4 mb-4">
+            <div class="card shadow-sm h-100 bg-light">
+                <div class="card-body text-center d-flex flex-column justify-content-center">
+                    <h5 class="card-title">Return to Main Site</h5>
+                    <p class="card-text">Go back to the public-facing website.</p>
+                    <a href="@Url.Action("Index", "Home")" class="btn btn-primary">
+                        <i class="fas fa-home"></i> Go to Homepage
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+    .hover-card {
+        transition: all 0.3s ease;
+    }
+    
+    .hover-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15) !important;
+    }
+    
+    .card-title {
+        font-weight: 600;
+    }
+</style> 

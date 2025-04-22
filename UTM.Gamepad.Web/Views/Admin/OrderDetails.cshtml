@@ -1,0 +1,273 @@
+@model UTM.Gamepad.Domain.Order
+@{
+    ViewBag.Title = "Order Details";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header pb-0 d-flex justify-content-between align-items-center">
+                    <div>
+                        <h5 class="mb-0">Order Details #@Model.Id.ToString().Substring(0, 8)</h5>
+                        <p class="text-sm mb-0">View and manage order information</p>
+                    </div>
+                    <a href="@Url.Action("Orders", "Admin")" class="btn btn-primary btn-sm">
+                        <i class="fas fa-arrow-left me-2"></i>Back to Orders
+                    </a>
+                </div>
+                
+                <div class="card-body">
+                    @if (ViewBag.SuccessMessage != null)
+                    {
+                        <div class="alert alert-success alert-dismissible fade show" role="alert">
+                            @ViewBag.SuccessMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    @if (ViewBag.ErrorMessage != null)
+                    {
+                        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                            @ViewBag.ErrorMessage
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    }
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Order Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Order ID:</label>
+                                        <p class="mb-1">@Model.Id</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Order Date:</label>
+                                        <p class="mb-1">@Model.OrderDate.ToString("MMM dd, yyyy HH:mm")</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Total Amount:</label>
+                                        <p class="mb-1">$@Model.TotalAmount.ToString("0.00")</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Status:</label>
+                                        <p class="mb-1">
+                                            @{
+                                                string badgeClass = "badge bg-secondary";
+                                                
+                                                switch (Model.Status.ToLower())
+                                                {
+                                                    case "pending":
+                                                        badgeClass = "badge bg-warning";
+                                                        break;
+                                                    case "processing":
+                                                        badgeClass = "badge bg-info";
+                                                        break;
+                                                    case "shipped":
+                                                        badgeClass = "badge bg-primary";
+                                                        break;
+                                                    case "delivered":
+                                                        badgeClass = "badge bg-success";
+                                                        break;
+                                                    case "cancelled":
+                                                        badgeClass = "badge bg-danger";
+                                                        break;
+                                                }
+                                            }
+                                            <span class="@badgeClass">@Model.Status</span>
+                                        </p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Payment Method:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.PaymentMethod) ? "Not specified" : Model.PaymentMethod)</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm text-muted">Notes:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.Notes) ? "No notes" : Model.Notes)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-6 mb-4">
+                            <div class="card shadow-sm">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Customer Information</h6>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Customer Name:</label>
+                                        <p class="mb-1">@Model.UserName</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Email:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.UserEmail) ? "Not specified" : Model.UserEmail)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Shipping Address:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.ShippingAddress) ? "Not specified" : Model.ShippingAddress)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">City:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.City) ? "Not specified" : Model.City)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">State/Province:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.State) ? "Not specified" : Model.State)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Zip/Postal Code:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.ZipCode) ? "Not specified" : Model.ZipCode)</p>
+                                    </div>
+                                    <div class="mb-3">
+                                        <label class="text-sm text-muted">Country:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.Country) ? "Not specified" : Model.Country)</p>
+                                    </div>
+                                    <div>
+                                        <label class="text-sm text-muted">Phone Number:</label>
+                                        <p class="mb-1">@(string.IsNullOrEmpty(Model.PhoneNumber) ? "Not specified" : Model.PhoneNumber)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow-sm mb-4">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Order Items</h6>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-responsive">
+                                <table class="table align-items-center mb-0">
+                                    <thead>
+                                        <tr>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7">Product</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Price</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Quantity</th>
+                                            <th class="text-uppercase text-secondary text-xxs font-weight-bolder opacity-7 ps-2">Subtotal</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        @foreach (var item in Model.OrderItems)
+                                        {
+                                            <tr>
+                                                <td>
+                                                    <div class="d-flex px-2 py-1">
+                                                        @if (!string.IsNullOrEmpty(item.ProductImageUrl))
+                                                        {
+                                                            <div class="me-3">
+                                                                <img src="@item.ProductImageUrl" class="avatar avatar-sm" alt="@item.ProductName">
+                                                            </div>
+                                                        }
+                                                        <div class="d-flex flex-column justify-content-center">
+                                                            <h6 class="mb-0 text-sm">@item.ProductName</h6>
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                                <td>
+                                                    <p class="text-sm font-weight-bold mb-0">$@item.Price.ToString("0.00")</p>
+                                                </td>
+                                                <td>
+                                                    <p class="text-sm font-weight-bold mb-0">@item.Quantity</p>
+                                                </td>
+                                                <td>
+                                                    <p class="text-sm font-weight-bold mb-0">$@((item.Price * item.Quantity).ToString("0.00"))</p>
+                                                </td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <td colspan="3" class="text-end">
+                                                <strong class="text-sm">Total:</strong>
+                                            </td>
+                                            <td>
+                                                <strong class="text-sm">$@Model.TotalAmount.ToString("0.00")</strong>
+                                            </td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-light">
+                            <h6 class="mb-0">Update Order Status</h6>
+                        </div>
+                        <div class="card-body">
+                            @using (Html.BeginForm("UpdateOrderStatus", "Admin", FormMethod.Post))
+                            {
+                                @Html.AntiForgeryToken()
+                                @Html.Hidden("OrderId", Model.Id)
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="mb-3">
+                                            <label class="form-label">Order Status</label>
+                                            <select name="Status" class="form-select" required>
+                                                <option value="">Select Status</option>
+                                                <option value="Pending" @(Model.Status == "Pending" ? "selected" : "")>Pending</option>
+                                                <option value="Processing" @(Model.Status == "Processing" ? "selected" : "")>Processing</option>
+                                                <option value="Shipped" @(Model.Status == "Shipped" ? "selected" : "")>Shipped</option>
+                                                <option value="Delivered" @(Model.Status == "Delivered" ? "selected" : "")>Delivered</option>
+                                                <option value="Cancelled" @(Model.Status == "Cancelled" ? "selected" : "")>Cancelled</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-8">
+                                        <div class="mb-3">
+                                            <label class="form-label">Notes</label>
+                                            <textarea name="Notes" class="form-control" rows="3">@Model.Notes</textarea>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="text-end">
+                                    <button type="submit" class="btn btn-primary">Update Status</button>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+        .product-img-small {
+            width: 60px;
+            height: 60px;
+            background-size: cover;
+            background-position: center;
+            border-radius: 4px;
+            border: 1px solid #eee;
+        }
+        
+        .print-hidden {
+            display: none;
+        }
+        
+        .print-text {
+            font-size: 12pt;
+        }
+        
+        .print-card {
+            border: none !important;
+            box-shadow: none !important;
+        }
+        
+        .print-card-header {
+            background-color: #f8f9fa !important;
+            color: #000 !important;
+        }
+        
+        .print-link:after {
+            content: none !important;
+        }
+    </style>
