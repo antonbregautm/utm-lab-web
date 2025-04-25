@@ -1,0 +1,167 @@
+@model List<UTM.Gamepad.Domain.User>
+@{
+    ViewBag.Title = "User Management";
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-users"></i> User Management
+            </h2>
+            <p class="lead text-muted">List of all registered users in the system</p>
+        </div>
+        <div class="col-md-4 text-right">
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Admin Panel
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-light">
+            <div class="row align-items-center">
+                <div class="col">
+                    <h5 class="mb-0">Users List</h5>
+                </div>
+                <div class="col-auto">
+                    <div class="input-group">
+                        <input type="text" id="userSearch" class="form-control" placeholder="Search by name or email...">
+                        <div class="input-group-append">
+                            <span class="input-group-text"><i class="fas fa-search"></i></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="usersTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Full Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th class="text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var user in Model)
+                        {
+                            <tr>
+                                <td class="text-muted">@user.Id.ToString().Substring(0, 8)...</td>
+                                <td>@user.FullName</td>
+                                <td>@user.Email</td>
+                                <td>
+                                    @if (user.Role != null)
+                                    {
+                                        <span class="badge badge-pill @(user.Role.Name == "Admin" ? "badge-danger" : "badge-info")">
+                                            @user.Role.Name
+                                        </span>
+                                    }
+                                    else
+                                    {
+                                        <span class="badge badge-pill badge-secondary">No Role</span>
+                                    }
+                                </td>
+                                <td class="text-center">
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="@Url.Action("EditUser", "Admin", new { id = user.Id })" class="btn btn-outline-primary" title="Edit">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+                                        <a href="@Url.Action("ResetPassword", "Admin", new { id = user.Id })" class="btn btn-outline-warning" title="Reset Password">
+                                            <i class="fas fa-key"></i>
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger delete-user" data-id="@user.Id" data-name="@user.FullName" title="Delete">
+                                            <i class="fas fa-trash-alt"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="text-muted">
+                Total users: <strong>@Model.Count</strong>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteUserModal" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="fas fa-exclamation-triangle"></i> Confirm Delete
+                </h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete the user <strong id="userNameToDelete"></strong>?</p>
+                <p class="text-danger">This action cannot be undone!</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Cancel</button>
+                @using (Html.BeginForm("DeleteUser", "Admin", FormMethod.Post, new { id = "deleteUserForm" }))
+                {
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="userIdToDelete" name="id" />
+                    <button type="submit" class="btn btn-danger">Delete User</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Search functionality
+            $("#userSearch").on("keyup", function() {
+                var value = $(this).val().toLowerCase();
+                $("#usersTable tbody tr").filter(function() {
+                    $(this).toggle($(this).text().toLowerCase().indexOf(value) > -1)
+                });
+            });
+            
+            // Delete user confirmation modal
+            $(".delete-user").click(function() {
+                var userId = $(this).data("id");
+                var userName = $(this).data("name");
+                
+                $("#userIdToDelete").val(userId);
+                $("#userNameToDelete").text(userName);
+                
+                $("#deleteUserModal").modal("show");
+            });
+        });
+    </script>
+} 

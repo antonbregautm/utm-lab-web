@@ -26,5 +26,10 @@ namespace UTM.Gamepad.Domain
 
         public virtual ICollection<Order> Orders { get; set; } = new List<Order>();
         public virtual ICollection<Review> Reviews { get; set; } = new List<Review>();
+        
+        public Guid? RoleId { get; set; }
+        
+        [ForeignKey("RoleId")]
+        public virtual Role Role { get; set; }
     }
 }

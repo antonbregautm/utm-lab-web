@@ -1,0 +1,309 @@
+@model Dictionary<string, object>
+@{
+    ViewBag.Title = "Site Statistics";
+    
+    // Извлекаем данные из модели для использования в представлении
+    var orderStats = Model["OrderStats"] as Dictionary<string, int>;
+    var totalSales = (decimal)Model["TotalSales"];
+    var categories = Model["Categories"] as Dictionary<string, int>;
+    var lowStockProducts = Model["LowStockProducts"] as List<UTM.Gamepad.Domain.Product>;
+    var outOfStockProducts = Model["OutOfStockProducts"] as List<UTM.Gamepad.Domain.Product>;
+}
+
+<div class="container py-5">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h2 class="text-primary">
+                <i class="fas fa-chart-bar"></i> Site Statistics
+            </h2>
+            <p class="lead text-muted">Overview of site performance, sales, and inventory</p>
+        </div>
+        <div class="col-md-4 text-end">
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Back to Admin Panel
+            </a>
+        </div>
+    </div>
+
+    <!-- Sales Overview -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0"><i class="fas fa-chart-line me-2"></i> Sales Overview</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="text-center p-3 rounded bg-light">
+                                <h3 class="text-primary mb-1">@orderStats["Total"]</h3>
+                                <p class="text-muted mb-0">Total Orders</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="text-center p-3 rounded bg-light">
+                                <h3 class="text-success mb-1">$@totalSales.ToString("0.00")</h3>
+                                <p class="text-muted mb-0">Total Sales</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3 mb-3 mb-md-0">
+                            <div class="text-center p-3 rounded bg-light">
+                                <h3 class="text-info mb-1">@(orderStats["Pending"] + orderStats["Processing"])</h3>
+                                <p class="text-muted mb-0">Active Orders</p>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="text-center p-3 rounded bg-light">
+                                <h3 class="text-danger mb-1">@orderStats["Cancelled"]</h3>
+                                <p class="text-muted mb-0">Cancelled Orders</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Order Statistics and Category Distribution -->
+    <div class="row mb-4">
+        <!-- Order Status Distribution -->
+        <div class="col-md-6 mb-4 mb-md-0">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0"><i class="fas fa-shopping-cart me-2"></i> Order Status Distribution</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Status</th>
+                                    <th>Count</th>
+                                    <th>Percentage</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var status in orderStats.Where(s => s.Key != "Total"))
+                                {
+                                    var percentage = orderStats["Total"] > 0 ? (status.Value * 100.0 / orderStats["Total"]) : 0;
+                                    var statusClass = "";
+                                    
+                                    switch (status.Key)
+                                    {
+                                        case "Pending": statusClass = "text-warning"; break;
+                                        case "Processing": statusClass = "text-info"; break;
+                                        case "Shipped": statusClass = "text-primary"; break;
+                                        case "Completed": statusClass = "text-success"; break;
+                                        case "Cancelled": statusClass = "text-danger"; break;
+                                    }
+                                    
+                                    <tr>
+                                        <td><span class="@statusClass">@status.Key</span></td>
+                                        <td>@status.Value</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px;">
+                                                <div class="progress-bar bg-@statusClass.Replace("text-", "")" role="progressbar" 
+                                                     style="width: @percentage.ToString("0.0")%;" 
+                                                     aria-valuenow="@percentage.ToString("0.0")" aria-valuemin="0" aria-valuemax="100">
+                                                    @percentage.ToString("0.0")%
+                                                </div>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Category Distribution -->
+        <div class="col-md-6">
+            <div class="card shadow-sm h-100 border-0">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0"><i class="fas fa-tags me-2"></i> Product Categories</h5>
+                </div>
+                <div class="card-body">
+                    @if (categories != null && categories.Any())
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th>Category</th>
+                                        <th>Products</th>
+                                        <th>Distribution</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @{ var totalProducts = categories.Values.Sum(); }
+                                    @foreach (var category in categories.OrderByDescending(c => c.Value))
+                                    {
+                                        var percentage = totalProducts > 0 ? (category.Value * 100.0 / totalProducts) : 0;
+                                        <tr>
+                                            <td>@category.Key</td>
+                                            <td>@category.Value</td>
+                                            <td>
+                                                <div class="progress" style="height: 20px;">
+                                                    <div class="progress-bar bg-info" role="progressbar" 
+                                                         style="width: @percentage.ToString("0.0")%;" 
+                                                         aria-valuenow="@percentage.ToString("0.0")" aria-valuemin="0" aria-valuemax="100">
+                                                        @percentage.ToString("0.0")%
+                                                    </div>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="alert alert-info">
+                            <i class="fas fa-info-circle me-2"></i> No product categories available.
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Inventory Alerts -->
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm border-0">
+                <div class="card-header bg-warning text-dark">
+                    <h5 class="mb-0"><i class="fas fa-exclamation-triangle me-2"></i> Inventory Alerts</h5>
+                </div>
+                <div class="card-body">
+                    <ul class="nav nav-tabs" id="inventoryTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="low-stock-tab" data-toggle="tab" data-target="#low-stock" 
+                                    type="button" role="tab" aria-controls="low-stock" aria-selected="true">
+                                Low Stock Items <span class="badge bg-warning text-dark ms-1">@(lowStockProducts?.Count ?? 0)</span>
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="out-of-stock-tab" data-toggle="tab" data-target="#out-of-stock" 
+                                    type="button" role="tab" aria-controls="out-of-stock" aria-selected="false">
+                                Out of Stock Items <span class="badge bg-danger text-white ms-1">@(outOfStockProducts?.Count ?? 0)</span>
+                            </button>
+                        </li>
+                    </ul>
+                    <div class="tab-content pt-3" id="inventoryTabContent">
+                        <!-- Low Stock Items -->
+                        <div class="tab-pane fade show active" id="low-stock" role="tabpanel" aria-labelledby="low-stock-tab">
+                            @if (lowStockProducts != null && lowStockProducts.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 60px;">Image</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>Stock</th>
+                                                <th>Price</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var product in lowStockProducts)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/Content/images/default-product.jpg" : product.ImageUrl)" 
+                                                             alt="@product.Name" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    </td>
+                                                    <td>@product.Name</td>
+                                                    <td>@product.Category</td>
+                                                    <td><span class="badge bg-warning text-dark">@product.StockQuantity left</span></td>
+                                                    <td>$@product.Price.ToString("0.00")</td>
+                                                    <td>
+                                                        <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i> No products with low stock.
+                                </div>
+                            }
+                        </div>
+                        
+                        <!-- Out of Stock Items -->
+                        <div class="tab-pane fade" id="out-of-stock" role="tabpanel" aria-labelledby="out-of-stock-tab">
+                            @if (outOfStockProducts != null && outOfStockProducts.Any())
+                            {
+                                <div class="table-responsive">
+                                    <table class="table table-striped">
+                                        <thead>
+                                            <tr>
+                                                <th style="width: 60px;">Image</th>
+                                                <th>Name</th>
+                                                <th>Category</th>
+                                                <th>Status</th>
+                                                <th>Price</th>
+                                                <th>Actions</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            @foreach (var product in outOfStockProducts)
+                                            {
+                                                <tr>
+                                                    <td>
+                                                        <img src="@(string.IsNullOrEmpty(product.ImageUrl) ? "/Content/images/default-product.jpg" : product.ImageUrl)" 
+                                                             alt="@product.Name" class="img-thumbnail" style="width: 50px; height: 50px; object-fit: cover;">
+                                                    </td>
+                                                    <td>@product.Name</td>
+                                                    <td>@product.Category</td>
+                                                    <td><span class="badge bg-danger">Out of Stock</span></td>
+                                                    <td>$@product.Price.ToString("0.00")</td>
+                                                    <td>
+                                                        <a href="@Url.Action("EditProduct", "Admin", new { id = product.Id })" class="btn btn-sm btn-outline-primary">
+                                                            <i class="fas fa-edit"></i> Edit
+                                                        </a>
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="alert alert-success">
+                                    <i class="fas fa-check-circle me-2"></i> No products out of stock.
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function() {
+            // Enable Bootstrap tabs
+            $('button[data-toggle="tab"]').on('click', function(e) {
+                e.preventDefault();
+                $(this).tab('show');
+            });
+            
+            // Initialize first tab
+            $('#low-stock-tab').tab('show');
+        });
+    </script>
+} 
