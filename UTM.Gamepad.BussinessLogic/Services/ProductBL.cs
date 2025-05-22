@@ -1,16 +1,17 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UTM.Gamepad.BussinessLogic.Services.Interfaces;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Infrastructure;
 
-namespace UTM.Gamepad.Application.Services
+namespace UTM.Gamepad.BussinessLogic.Services
 {
-    public class ProductService
+    public class ProductBL : IProductBL
     {
         private readonly ProductRepository _productRepository;
         
-        public ProductService()
+        public ProductBL()
         {
             _productRepository = new ProductRepository();
         }
@@ -64,33 +65,6 @@ namespace UTM.Gamepad.Application.Services
                 return false;
                 
             return _productRepository.Delete(id);
-        }
-        
-        public List<Product> GetProductsByCategory(string category)
-        {
-            if (string.IsNullOrEmpty(category))
-                return new List<Product>();
-                
-            return _productRepository.GetAll().Where(p => p.Category == category).ToList();
-        }
-        
-        public List<Product> SearchProducts(string searchTerm)
-        {
-            if (string.IsNullOrEmpty(searchTerm))
-                return new List<Product>();
-                
-            return _productRepository.GetAll().Where(p => 
-                p.Name.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0 || 
-                p.Description.IndexOf(searchTerm, StringComparison.OrdinalIgnoreCase) >= 0).ToList();
-        }
-        
-        public List<string> GetCategories()
-        {
-            return _productRepository.GetAll()
-                .Select(p => p.Category)
-                .Where(c => !string.IsNullOrEmpty(c))
-                .Distinct()
-                .ToList();
         }
     }
 } 

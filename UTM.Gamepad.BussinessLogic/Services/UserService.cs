@@ -5,7 +5,7 @@ using UTM.Gamepad.Domain;
 using UTM.Gamepad.Infrastructure;
 using UTM.Gamepad.Infrastructure.Repository;
 
-namespace UTM.Gamepad.Application.Services
+namespace UTM.Gamepad.BussinessLogic.Services
 {
     public class UserService
     {

@@ -257,9 +257,9 @@
         <Content Include="Scripts\jquery-3.3.1.min.map"/>
     </ItemGroup>
     <ItemGroup>
-      <ProjectReference Include="..\UTM.Gamepad.Application\UTM.Gamepad.Application.csproj">
+      <ProjectReference Include="..\UTM.Gamepad.BussinessLogic\UTM.Gamepad.BussinessLogic.csproj">
         <Project>{7682e787-7e29-4722-9827-d4d783b25321}</Project>
-        <Name>UTM.Gamepad.Application</Name>
+        <Name>UTM.Gamepad.BussinessLogic</Name>
       </ProjectReference>
       <ProjectReference Include="..\UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj">
         <Project>{e4fdb5f5-572b-47f8-9110-49646dd80b4a}</Project>

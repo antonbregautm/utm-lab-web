@@ -1,13 +1,21 @@
 ﻿using System.Web.Mvc; // Подключаем библиотеку для работы с веб-страницами (MVC)
 using System.Linq;
-using UTM.Gamepad.Application.Services;
+using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.Services.Interfaces;
 
 namespace UTM.Gamepad.Web.Controllers // Пространство имён (где находится этот код)
 {
     public class HomeController : Controller // Этот класс управляет страницами сайта
     {
-        private readonly UserService _userService = new UserService();
-        private readonly RoleService _roleService = new RoleService();
+        private readonly IUserBL _userBL;
+        private readonly IRoleBL _roleBL;
+        
+        public HomeController()
+        {
+            var factory = BusinessLogicFactory.Instance;
+            _userBL = factory.GetUserBL();
+            _roleBL = factory.GetRoleBL();
+        }
         
         // Метод (экшен) для главной страницы (Главная / Home)
         public ActionResult Index()

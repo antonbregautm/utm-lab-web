@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Web", "UTM.Game
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Domain", "UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj", "{E4FDB5F5-572B-47F8-9110-49646DD80B4A}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Application", "UTM.Gamepad.Application\UTM.Gamepad.Application.csproj", "{7682E787-7E29-4722-9827-D4D783B25321}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.BussinessLogic", "UTM.Gamepad.BussinessLogic\UTM.Gamepad.BussinessLogic.csproj", "{7682E787-7E29-4722-9827-D4D783B25321}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UTM.Gamepad.Infrastructure", "UTM.Gamepad.Infrastructure\UTM.Gamepad.Infrastructure.csproj", "{737E1BA4-BA1B-4388-9FC2-55253B433BC7}"
 EndProject
