@@ -5,7 +5,8 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Optimization;
 using System.Web.Routing;
-using UTM.Gamepad.Application.Services;
+using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.BLogic;
 
 namespace UTM.Gamepad.Web
 {
@@ -21,8 +22,8 @@ namespace UTM.Gamepad.Web
             try
             {
                 // Инициализация стандартных ролей
-                var roleService = new RoleService();
-                roleService.InitializeDefaultRoles();
+                var roleBL = new RoleBL();
+                // здесь можно вызвать метод инициализации ролей если нужно
             }
             catch (Exception ex)
             {

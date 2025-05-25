@@ -8,24 +8,29 @@ namespace UTM.Gamepad.Domain
     public class OrderItem
     {
         [Key]
-        public Guid Id { get; set; } = Guid.NewGuid();
-
+        public Guid Id { get; set; }
+        
         [Required]
         public Guid OrderId { get; set; }
-
-        [ForeignKey("OrderId")]
-        public virtual Order Order { get; set; }
-
+        
         [Required]
         public Guid ProductId { get; set; }
-
-        [ForeignKey("ProductId")]
-        public virtual Product Product { get; set; }
-
+        
+        [Required]
+        public string ProductName { get; set; }
+        
+        public string ProductImageUrl { get; set; }
+        
+        [Required]
+        public decimal Price { get; set; }
+        
         [Required]
         public int Quantity { get; set; }
-
-        [Required]
-        public decimal UnitPrice { get; set; }
+        
+        [ForeignKey("OrderId")]
+        public virtual Order Order { get; set; }
+        
+        [ForeignKey("ProductId")]
+        public virtual Product Product { get; set; }
     }
 }

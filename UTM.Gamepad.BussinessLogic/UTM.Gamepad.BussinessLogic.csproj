@@ -8,8 +8,8 @@
         <ProjectGuid>{7682E787-7E29-4722-9827-D4D783B25321}</ProjectGuid>
         <OutputType>Library</OutputType>
         <AppDesignerFolder>Properties</AppDesignerFolder>
-        <RootNamespace>UTM.Gamepad.Application</RootNamespace>
-        <AssemblyName>UTM.Gamepad.Application</AssemblyName>
+        <RootNamespace>UTM.Gamepad.BussinessLogic</RootNamespace>
+        <AssemblyName>UTM.Gamepad.BussinessLogic</AssemblyName>
         <TargetFrameworkVersion>v4.8.1</TargetFrameworkVersion>
         <FileAlignment>512</FileAlignment>
     </PropertyGroup>
@@ -43,15 +43,27 @@
         <Reference Include="System.ComponentModel.DataAnnotations" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
+        <Reference Include="System.Web" />
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BLogic\AuthBL.cs" />
+        <Compile Include="BLogic\OrderBL.cs" />
+        <Compile Include="BLogic\ProductBL.cs" />
+        <Compile Include="BLogic\RoleBL.cs" />
+        <Compile Include="BLogic\UserBL.cs" />
+        <Compile Include="BusinessLogicFactory.cs" />
+        <Compile Include="Core\AuthApi.cs" />
+        <Compile Include="Core\OrderApi.cs" />
+        <Compile Include="Core\ProductApi.cs" />
+        <Compile Include="Core\RoleApi.cs" />
+        <Compile Include="Core\UserApi.cs" />
+        <Compile Include="Interfaces\IAuthBL.cs" />
+        <Compile Include="Interfaces\IOrderBL.cs" />
+        <Compile Include="Interfaces\IProductBL.cs" />
+        <Compile Include="Interfaces\IRoleBL.cs" />
+        <Compile Include="Interfaces\IUserBL.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Services\AuthService.cs" />
-        <Compile Include="Services\RoleService.cs" />
-        <Compile Include="Services\UserService.cs" />
-        <Compile Include="Services\ProductService.cs" />
-        <Compile Include="Services\OrderService.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj">

@@ -1,0 +1,248 @@
+@model List<UTM.Gamepad.Domain.Order>
+@{
+    ViewBag.Title = "Order Management";
+}
+
+<div class="container-fluid py-4">
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <h2 class="text-primary">
+                <i class="fas fa-clipboard-list"></i> Order Management
+            </h2>
+            <p class="text-muted">View and manage customer orders</p>
+        </div>
+        <div class="col-md-6 text-right">
+            <a href="@Url.Action("Index", "Admin")" class="btn btn-outline-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Admin Panel
+            </a>
+        </div>
+    </div>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="fas fa-check-circle"></i> @TempData["SuccessMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="fas fa-exclamation-circle"></i> @TempData["ErrorMessage"]
+            <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                <span aria-hidden="true">&times;</span>
+            </button>
+        </div>
+    }
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-white d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">All Orders</h5>
+            <div class="form-inline">
+                <div class="input-group">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text">
+                            <i class="fas fa-search"></i>
+                        </span>
+                    </div>
+                    <input type="text" id="orderSearch" class="form-control" placeholder="Search orders...">
+                </div>
+                <select id="statusFilter" class="form-control ml-2">
+                    <option value="">All Statuses</option>
+                    <option value="Pending">Pending</option>
+                    <option value="Processing">Processing</option>
+                    <option value="Shipped">Shipped</option>
+                    <option value="Completed">Completed</option>
+                    <option value="Cancelled">Cancelled</option>
+                </select>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0" id="ordersTable">
+                    <thead class="thead-light">
+                        <tr>
+                            <th>Order ID</th>
+                            <th>Customer</th>
+                            <th>Date</th>
+                            <th>Total</th>
+                            <th>Status</th>
+                            <th class="text-center">Items</th>
+                            <th class="text-right">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model != null && Model.Any())
+                        {
+                            foreach (var order in Model.OrderByDescending(o => o.OrderDate))
+                            {
+                                <tr class="order-row" data-status="@order.Status">
+                                    <td class="font-weight-bold">
+                                        <span title="@order.Id">
+                                            #@order.Id.ToString().Substring(0, 8)...
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <div>
+                                            <span class="d-block">@order.UserName</span>
+                                            <small class="text-muted">@order.UserEmail</small>
+                                        </div>
+                                    </td>
+                                    <td>@order.OrderDate.ToString("MMM dd, yyyy HH:mm")</td>
+                                    <td>$@order.TotalAmount.ToString("0.00")</td>
+                                    <td>
+                                        @{
+                                            string badgeClass = "badge-secondary";
+                                            switch (order.Status)
+                                            {
+                                                case "Pending":
+                                                    badgeClass = "badge-warning";
+                                                    break;
+                                                case "Processing":
+                                                    badgeClass = "badge-info";
+                                                    break;
+                                                case "Shipped":
+                                                    badgeClass = "badge-primary";
+                                                    break;
+                                                case "Completed":
+                                                    badgeClass = "badge-success";
+                                                    break;
+                                                case "Cancelled":
+                                                    badgeClass = "badge-danger";
+                                                    break;
+                                            }
+                                        }
+                                        <span class="badge @badgeClass">@order.Status</span>
+                                    </td>
+                                    <td class="text-center">
+                                        @order.OrderItems.Count
+                                    </td>
+                                    <td class="text-right">
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="@Url.Action("OrderDetails", "Admin", new { id = order.Id })" class="btn btn-outline-primary">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <button type="button" class="btn btn-outline-secondary dropdown-toggle" data-toggle="dropdown">
+                                                <i class="fas fa-cog"></i>
+                                            </button>
+                                            <div class="dropdown-menu dropdown-menu-right">
+                                                @if (order.Status == "Pending")
+                                                {
+                                                    <a href="@Url.Action("UpdateOrderStatus", "Admin", new { id = order.Id, status = "Processing" })" class="dropdown-item">
+                                                        <i class="fas fa-cogs text-info"></i> Mark Processing
+                                                    </a>
+                                                }
+                                                @if (order.Status == "Processing")
+                                                {
+                                                    <a href="@Url.Action("UpdateOrderStatus", "Admin", new { id = order.Id, status = "Shipped" })" class="dropdown-item">
+                                                        <i class="fas fa-shipping-fast text-primary"></i> Mark Shipped
+                                                    </a>
+                                                }
+                                                @if (order.Status == "Shipped")
+                                                {
+                                                    <a href="@Url.Action("UpdateOrderStatus", "Admin", new { id = order.Id, status = "Completed" })" class="dropdown-item">
+                                                        <i class="fas fa-check-circle text-success"></i> Mark Completed
+                                                    </a>
+                                                }
+                                                @if (order.Status != "Cancelled" && order.Status != "Completed")
+                                                {
+                                                    <div class="dropdown-divider"></div>
+                                                    <a href="@Url.Action("UpdateOrderStatus", "Admin", new { id = order.Id, status = "Cancelled" })" 
+                                                       class="dropdown-item text-danger"
+                                                       onclick="return confirm('Are you sure you want to cancel this order?');">
+                                                        <i class="fas fa-times-circle"></i> Cancel Order
+                                                    </a>
+                                                }
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                        else
+                        {
+                            <tr>
+                                <td colspan="7" class="text-center py-4">
+                                    <div class="empty-state">
+                                        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                                        <p class="lead">No orders found</p>
+                                        <p class="text-muted">Orders will appear here once customers make purchases</p>
+                                    </div>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer bg-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <span class="text-muted">Showing <span id="visibleOrders">@(Model?.Count ?? 0)</span> of <span id="totalOrders">@(Model?.Count ?? 0)</span> orders</span>
+                </div>
+                <div>
+                    <span class="text-muted">Last updated: @DateTime.Now.ToString("MMM dd, yyyy HH:mm")</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        $(document).ready(function () {
+            // Search functionality
+            $("#orderSearch").on("keyup", function () {
+                var value = $(this).val().toLowerCase();
+                filterOrders();
+            });
+
+            // Status filter
+            $("#statusFilter").on("change", function () {
+                filterOrders();
+            });
+
+            function filterOrders() {
+                var searchValue = $("#orderSearch").val().toLowerCase();
+                var statusFilter = $("#statusFilter").val();
+                var visibleCount = 0;
+                var totalCount = $(".order-row").length;
+                
+                $(".order-row").each(function () {
+                    var rowText = $(this).text().toLowerCase();
+                    var status = $(this).data("status");
+                    var statusMatch = statusFilter === "" || status === statusFilter;
+                    var searchMatch = searchValue === "" || rowText.indexOf(searchValue) > -1;
+                    
+                    if (statusMatch && searchMatch) {
+                        $(this).show();
+                        visibleCount++;
+                    } else {
+                        $(this).hide();
+                    }
+                });
+                
+                $("#visibleOrders").text(visibleCount);
+                $("#totalOrders").text(totalCount);
+                
+                if (visibleCount === 0 && $(".order-row").length > 0) {
+                    if ($("#noResults").length === 0) {
+                        $("#ordersTable tbody").append(
+                            '<tr id="noResults"><td colspan="7" class="text-center py-4">' +
+                            '<div class="empty-state">' +
+                            '<i class="fas fa-search fa-3x text-muted mb-3"></i>' +
+                            '<p class="lead">No matching orders found</p>' +
+                            '<p class="text-muted">Try adjusting your search or filter criteria</p>' +
+                            '</div></td></tr>'
+                        );
+                    }
+                } else {
+                    $("#noResults").remove();
+                }
+            }
+        });
+    </script>
+} 

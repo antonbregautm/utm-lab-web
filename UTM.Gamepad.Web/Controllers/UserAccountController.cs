@@ -2,15 +2,23 @@
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
-using UTM.Gamepad.Application.Services;
+using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 using UTM.Gamepad.Domain;
 
 namespace UTM.Gamepad.Web.Controllers
 {
     public class UserAccountController : Controller
     {
-        private readonly AuthService _authService = new AuthService();
-        private readonly OrderService _orderService = new OrderService();
+        private readonly IAuthBL _authBL;
+        private readonly IOrderBL _orderBL;
+
+        public UserAccountController()
+        {
+            var factory = BusinessLogicFactory.Instance;
+            _authBL = factory.GetAuthBL();
+            _orderBL = factory.GetOrderBL();
+        }
 
         // GET: Login page
         public ActionResult SignIn()
@@ -33,7 +41,7 @@ namespace UTM.Gamepad.Web.Controllers
                 return View();
             }
 
-            var user = _authService.AuthenticateUser(email, password);
+            var user = _authBL.AuthenticateUser(email, password);
             if (user != null)
             {
                 AuthenticateAndRedirect(user);
@@ -80,7 +88,7 @@ namespace UTM.Gamepad.Web.Controllers
                 return View();
             }
 
-            var user = _authService.CreateAccount(fullName, email, password);
+            var user = _authBL.CreateAccount(fullName, email, password);
             if (user != null)
             {
                 AuthenticateAndRedirect(user);
@@ -96,7 +104,7 @@ namespace UTM.Gamepad.Web.Controllers
         public ActionResult Profile()
         {
             var email = User.Identity.Name;
-            var user = _authService.GetUserByEmail(email);
+            var user = _authBL.GetUserByEmail(email);
             
             if (user == null)
             {
@@ -104,7 +112,7 @@ namespace UTM.Gamepad.Web.Controllers
             }
             
             // Получаем заказы пользователя
-            var orders = _orderService.GetOrdersByUserId(user.Id);
+            var orders = _orderBL.GetOrdersByUserId(user.Id);
             
             // Устанавливаем простые свойства пользователя напрямую в ViewBag
             ViewBag.UserFullName = user.FullName;

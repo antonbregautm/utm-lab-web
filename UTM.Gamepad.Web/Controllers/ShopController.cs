@@ -3,28 +3,37 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using UTM.Gamepad.Application.Services;
+using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 using UTM.Gamepad.Domain;
 
 namespace UTM.Gamepad.Web.Controllers
 {
     public class ShopController : Controller
     {
-        private readonly ProductService _productService = new ProductService();
-        private readonly OrderService _orderService = new OrderService();
-        private readonly UserService _userService = new UserService();
+        private readonly IProductBL _productBL;
+        private readonly IOrderBL _orderBL;
+        private readonly IUserBL _userBL;
+        
+        public ShopController()
+        {
+            var factory = BusinessLogicFactory.Instance;
+            _productBL = factory.GetProductBL();
+            _orderBL = factory.GetOrderBL();
+            _userBL = factory.GetUserBL();
+        }
         
         // GET: Catalog - отображение всех продуктов
         public ActionResult Catalog()
         {
-            var products = _productService.GetAllProducts();
+            var products = _productBL.GetAllProducts();
             return View(products);
         }
         
         // GET: Product Details
         public ActionResult ProductDetails(Guid id)
         {
-            var product = _productService.GetProductById(id);
+            var product = _productBL.GetProductById(id);
             if (product == null)
             {
                 return HttpNotFound();
@@ -46,7 +55,7 @@ namespace UTM.Gamepad.Web.Controllers
         [Authorize]
         public ActionResult AddToCart(Guid productId, int quantity = 1)
         {
-            var product = _productService.GetProductById(productId);
+            var product = _productBL.GetProductById(productId);
             if (product == null)
             {
                 TempData["ErrorMessage"] = "Product not found";
@@ -163,7 +172,7 @@ namespace UTM.Gamepad.Web.Controllers
             {
                 // Получаем текущего пользователя
                 var userEmail = User.Identity.Name;
-                var user = _userService.GetUserByEmail(userEmail);
+                var user = _userBL.GetUserByEmail(userEmail);
                 
                 if (user == null)
                 {
@@ -199,13 +208,13 @@ namespace UTM.Gamepad.Web.Controllers
                     PaymentMethod = orderDetails.PaymentMethod
                 };
                 
-                // Сохраняем заказ в базе данных
-                if (_orderService.CreateOrder(order))
+                // Сохраняем заказ
+                if (_orderBL.CreateOrder(order))
                 {
                     // Очищаем корзину
                     Session["Cart"] = null;
                     
-                    TempData["OrderSuccess"] = true;
+                    // Перенаправляем на страницу подтверждения заказа
                     TempData["OrderId"] = order.Id;
                     return RedirectToAction("OrderConfirmation");
                 }
@@ -217,7 +226,7 @@ namespace UTM.Gamepad.Web.Controllers
             }
             catch (Exception ex)
             {
-                TempData["ErrorMessage"] = "Error: " + ex.Message;
+                TempData["ErrorMessage"] = $"Error: {ex.Message}";
                 return RedirectToAction("Checkout");
             }
         }
@@ -226,111 +235,92 @@ namespace UTM.Gamepad.Web.Controllers
         [Authorize]
         public ActionResult OrderConfirmation()
         {
-            if (TempData["OrderSuccess"] == null || !(bool)TempData["OrderSuccess"])
+            var orderId = TempData["OrderId"] as Guid?;
+            if (!orderId.HasValue)
             {
-                return RedirectToAction("Catalog");
+                return RedirectToAction("Index", "Home");
             }
             
-            var orderId = (Guid)TempData["OrderId"];
-            var order = _orderService.GetOrderById(orderId);
+            var order = _orderBL.GetOrderById(orderId.Value);
+            return View(order);
+        }
+        
+        // GET: My Orders - просмотр заказов пользователя
+        [Authorize]
+        public ActionResult MyOrders()
+        {
+            var userEmail = User.Identity.Name;
+            var user = _userBL.GetUserByEmail(userEmail);
+            
+            if (user == null)
+            {
+                return RedirectToAction("SignIn", "UserAccount");
+            }
+            
+            var orders = _orderBL.GetOrdersByUserId(user.Id);
+            return View(orders);
+        }
+        
+        // GET: Order Details - детальная информация о заказе
+        [Authorize]
+        public ActionResult OrderDetails(Guid id)
+        {
+            var order = _orderBL.GetOrderById(id);
+            if (order == null)
+            {
+                return HttpNotFound();
+            }
+            
+            // Проверяем, что заказ принадлежит текущему пользователю
+            var userEmail = User.Identity.Name;
+            var user = _userBL.GetUserByEmail(userEmail);
+            
+            if (user == null || order.UserId != user.Id)
+            {
+                return RedirectToAction("MyOrders");
+            }
             
             return View(order);
         }
         
-        // GET: My Orders - список заказов пользователя
+        // POST: Cancel Order - отмена заказа
+        [HttpPost]
         [Authorize]
-        public ActionResult MyOrders()
+        [ValidateAntiForgeryToken]
+        public ActionResult CancelOrder(Guid id)
         {
-            try
-            {
-                var userEmail = User.Identity.Name;
-                var user = _userService.GetUserByEmail(userEmail);
-                
-                if (user == null)
-                {
-                    return RedirectToAction("SignIn", "UserAccount");
-                }
-                
-                var orders = _orderService.GetOrdersByUserId(user.Id);
-                return View(orders);
-            }
-            catch (Exception ex)
-            {
-                TempData["ErrorMessage"] = "Error loading orders: " + ex.Message;
-                return RedirectToAction("Index", "Home");
-            }
-        }
-        
-        // GET: Order Details - детали заказа
-        [Authorize]
-        public ActionResult OrderDetails(Guid id)
-        {
-            try
-            {
-                var userEmail = User.Identity.Name;
-                var user = _userService.GetUserByEmail(userEmail);
-                
-                if (user == null)
-                {
-                    return RedirectToAction("SignIn", "UserAccount");
-                }
-                
-                var order = _orderService.GetOrderById(id);
-                
-                // Проверяем, принадлежит ли заказ пользователю или является ли пользователь админом/менеджером
-                if (order == null || (order.UserId != user.Id && !User.IsInRole("Admin") && !User.IsInRole("Manager")))
-                {
-                    return HttpNotFound();
-                }
-                
-                return View(order);
-            }
-            catch
+            var order = _orderBL.GetOrderById(id);
+            if (order == null)
             {
                 return HttpNotFound();
             }
-        }
-        
-        // GET: Cancel Order - отмена заказа пользователем
-        [Authorize]
-        public ActionResult CancelOrder(Guid id)
-        {
-            try
+            
+            // Проверяем, что заказ принадлежит текущему пользователю
+            var userEmail = User.Identity.Name;
+            var user = _userBL.GetUserByEmail(userEmail);
+            
+            if (user == null || order.UserId != user.Id)
             {
-                var userEmail = User.Identity.Name;
-                var user = _userService.GetUserByEmail(userEmail);
-                
-                if (user == null)
-                {
-                    return RedirectToAction("SignIn", "UserAccount");
-                }
-                
-                var order = _orderService.GetOrderById(id);
-                
-                // Проверяем, принадлежит ли заказ пользователю и находится ли он в статусе, который можно отменить
-                if (order == null || order.UserId != user.Id || 
-                    !(order.Status == "Pending" || order.Status == "Processing"))
-                {
-                    TempData["ErrorMessage"] = "Cannot cancel this order";
-                    return RedirectToAction("MyOrders");
-                }
-                
-                if (_orderService.CancelOrder(id))
-                {
-                    TempData["SuccessMessage"] = "Order cancelled successfully";
-                }
-                else
-                {
-                    TempData["ErrorMessage"] = "Error cancelling order";
-                }
-                
                 return RedirectToAction("MyOrders");
             }
-            catch
+            
+            // Проверяем, что заказ можно отменить (только в статусе "Pending")
+            if (order.Status != "Pending")
             {
-                TempData["ErrorMessage"] = "Error processing your request";
-                return RedirectToAction("MyOrders");
+                TempData["ErrorMessage"] = "Only pending orders can be cancelled";
+                return RedirectToAction("OrderDetails", new { id });
             }
+            
+            if (_orderBL.CancelOrder(id))
+            {
+                TempData["SuccessMessage"] = "Order cancelled successfully";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Error cancelling order";
+            }
+            
+            return RedirectToAction("MyOrders");
         }
     }
 } 

@@ -4,7 +4,7 @@ using System.Linq;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Infrastructure;
 
-namespace UTM.Gamepad.Application.Services
+namespace UTM.Gamepad.BussinessLogic.Services
 {
     public class OrderService
     {
