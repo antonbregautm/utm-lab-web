@@ -1,7 +1,7 @@
 ﻿using System.Web.Mvc; // Подключаем библиотеку для работы с веб-страницами (MVC)
 using System.Linq;
 using UTM.Gamepad.BussinessLogic;
-using UTM.Gamepad.BussinessLogic.Services.Interfaces;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 
 namespace UTM.Gamepad.Web.Controllers // Пространство имён (где находится этот код)
 {

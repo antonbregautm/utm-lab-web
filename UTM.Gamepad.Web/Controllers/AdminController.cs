@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Web.Mvc;
 using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 using UTM.Gamepad.BussinessLogic.Services.Interfaces;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Infrastructure;

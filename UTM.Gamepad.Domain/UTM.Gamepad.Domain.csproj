@@ -37,6 +37,7 @@
         <Reference Include="System.ComponentModel.DataAnnotations" />
         <Reference Include="System.Core"/>
         <Reference Include="System.Data"/>
+        <Reference Include="System.Web" />
         <Reference Include="System.Xml"/>
     </ItemGroup>
     <ItemGroup>
@@ -47,6 +48,11 @@
         <Compile Include="Review.cs" />
         <Compile Include="Role.cs" />
         <Compile Include="User.cs" />
+        <Compile Include="DTOs\AuthResultDto.cs" />
+        <Compile Include="DTOs\CartActionDto.cs" />
+        <Compile Include="DTOs\CartResultDto.cs" />
+        <Compile Include="DTOs\UserProfileDto.cs" />
+        <Compile Include="DTOs\SignOutResultDto.cs" />
     </ItemGroup>
     <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets"/>
     <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

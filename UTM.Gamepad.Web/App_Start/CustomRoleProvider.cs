@@ -1,13 +1,22 @@
 using System;
 using System.Linq;
 using System.Web.Security;
-using UTM.Gamepad.Application.Services;
+using UTM.Gamepad.BussinessLogic;
+using UTM.Gamepad.BussinessLogic.BLogic;
 
 namespace UTM.Gamepad.Web.App_Start
 {
     public class CustomRoleProvider : RoleProvider
     {
-        private readonly UserService _userService = new UserService();
+        private readonly UserBL _userBL;
+        private readonly RoleBL _roleBL;
+
+        public CustomRoleProvider()
+        {
+            var factory = BusinessLogicFactory.Instance;
+            _userBL = factory.GetUserBL() as UserBL;
+            _roleBL = factory.GetRoleBL() as RoleBL;
+        }
 
         public override string ApplicationName 
         { 
@@ -17,7 +26,7 @@ namespace UTM.Gamepad.Web.App_Start
 
         public override bool IsUserInRole(string username, string roleName)
         {
-            var user = _userService.GetUserByEmail(username);
+            var user = _userBL.GetUserByEmail(username);
             if (user == null || user.Role == null)
                 return false;
                 
@@ -26,7 +35,7 @@ namespace UTM.Gamepad.Web.App_Start
 
         public override string[] GetRolesForUser(string username)
         {
-            var user = _userService.GetUserByEmail(username);
+            var user = _userBL.GetUserByEmail(username);
             if (user == null || user.Role == null)
                 return new string[] { };
                 
@@ -35,7 +44,7 @@ namespace UTM.Gamepad.Web.App_Start
 
         public override string[] GetUsersInRole(string roleName)
         {
-            var users = _userService.GetAllUsers();
+            var users = _userBL.GetAllUsers();
             if (users == null)
                 return new string[] { };
                 
@@ -47,8 +56,7 @@ namespace UTM.Gamepad.Web.App_Start
 
         public override bool RoleExists(string roleName)
         {
-            var roleService = new RoleService();
-            var roles = roleService.GetAllRoles();
+            var roles = _roleBL.GetAllRoles();
             return roles.Any(r => r.Name == roleName);
         }
 
@@ -76,8 +84,7 @@ namespace UTM.Gamepad.Web.App_Start
 
         public override string[] GetAllRoles()
         {
-            var roleService = new RoleService();
-            return roleService.GetAllRoles().Select(r => r.Name).ToArray();
+            return _roleBL.GetAllRoles().Select(r => r.Name).ToArray();
         }
 
         public override void RemoveUsersFromRoles(string[] usernames, string[] roleNames)

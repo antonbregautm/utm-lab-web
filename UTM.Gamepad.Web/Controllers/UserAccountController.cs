@@ -3,7 +3,7 @@ using System.Web;
 using System.Web.Mvc;
 using System.Web.Security;
 using UTM.Gamepad.BussinessLogic;
-using UTM.Gamepad.BussinessLogic.Services.Interfaces;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 using UTM.Gamepad.Domain;
 
 namespace UTM.Gamepad.Web.Controllers
