@@ -2,7 +2,7 @@ using System.Web;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Domain.DTOs;
 
-namespace UTM.Gamepad.BussinessLogic.Services.Interfaces
+namespace UTM.Gamepad.BussinessLogic.Interfaces
 {
     public interface IAuthBL
     {

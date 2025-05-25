@@ -3,29 +3,22 @@ using System.Security.Cryptography;
 using System.Text;
 using System.Web;
 using System.Web.Security;
-using UTM.Gamepad.BussinessLogic.Services.Interfaces;
+using UTM.Gamepad.BussinessLogic.Core;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Domain.DTOs;
 using UTM.Gamepad.Infrastructure;
 using UTM.Gamepad.Infrastructure.Repository;
 
-namespace UTM.Gamepad.BussinessLogic.Services
+namespace UTM.Gamepad.BussinessLogic.BLogic
 {
-    public class AuthBL : IAuthBL
+    public class AuthBL : AuthApi, IAuthBL
     {
-        private readonly UserRepository _userRepository;
-        private readonly RoleRepository _roleRepository;
-
-        public AuthBL()
-        {
-            var dbContext = new ApplicationDbContext();
-            _userRepository = new UserRepository(dbContext);
-            _roleRepository = new RoleRepository(dbContext);
-        }
-
+        public AuthBL() : base() { }
+        
         public User AuthenticateUser(string email, string password)
         {
-            var user = _userRepository.GetByEmail(email);
+            var user = GetUserByEmailFromDb(email);
             if (user != null && IsPasswordValid(password, user.PasswordHash))
             {
                 return user;
@@ -40,19 +33,19 @@ namespace UTM.Gamepad.BussinessLogic.Services
 
         public User CreateAccount(string fullName, string email, string password)
         {
-            if (_userRepository.GetByEmail(email) != null)
+            if (GetUserByEmailFromDb(email) != null)
             {
                 return null;
             }
             
             string passwordHash = CreatePasswordHash(password);
 
-            var defaultRole = _roleRepository.GetByName("User");
+            var defaultRole = GetRoleRepository().GetByName("User");
             
             if (defaultRole == null)
             {
                 defaultRole = new Role { Name = "User", Description = "Обычный пользователь системы" };
-                _roleRepository.Add(defaultRole);
+                GetRoleRepository().Add(defaultRole);
             }
 
             var newUser = new User
@@ -64,10 +57,10 @@ namespace UTM.Gamepad.BussinessLogic.Services
                 Role = defaultRole  
             };
             
-            return _userRepository.Add(newUser);
+            return GetUserRepository().Add(newUser);
         }
         
-        private static string CreatePasswordHash(string password)
+        private static new string CreatePasswordHash(string password)
         {
             using (var sha256 = SHA256.Create())
             {
@@ -76,7 +69,7 @@ namespace UTM.Gamepad.BussinessLogic.Services
             }
         }
 
-        private static bool IsPasswordValid(string password, string storedHash)
+        private static new bool IsPasswordValid(string password, string storedHash)
         {
             string hashedPassword = CreatePasswordHash(password);
             return hashedPassword == storedHash;
@@ -84,7 +77,7 @@ namespace UTM.Gamepad.BussinessLogic.Services
         
         public User GetUserByEmail(string email)
         {
-            return _userRepository.GetByEmail(email);
+            return GetUserByEmailFromDb(email);
         }
         
         // Новые методы с DTO
@@ -102,7 +95,7 @@ namespace UTM.Gamepad.BussinessLogic.Services
             {
                 result.IsSuccess = true;
                 result.ErrorMessage = null;
-                result.UserId = user.Id;
+                result.UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16);
                 result.Email = user.Email;
                 result.UserRole = user.Role?.Name ?? "User";
                 result.AuthCookie = CreateAuthCookie(user);
@@ -124,7 +117,7 @@ namespace UTM.Gamepad.BussinessLogic.Services
             {
                 result.IsSuccess = true;
                 result.ErrorMessage = null;
-                result.UserId = user.Id;
+                result.UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16);
                 result.Email = user.Email;
                 result.UserRole = user.Role?.Name ?? "User";
                 result.AuthCookie = CreateAuthCookie(user);
@@ -143,7 +136,7 @@ namespace UTM.Gamepad.BussinessLogic.Services
             
             return new UserProfileDto
             {
-                UserId = user.Id,
+                UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16),
                 FullName = user.FullName,
                 Email = user.Email,
                 RoleName = user.Role?.Name ?? "Пользователь"

@@ -43,26 +43,27 @@
         <Reference Include="System.ComponentModel.DataAnnotations" />
         <Reference Include="System.Core" />
         <Reference Include="System.Data" />
+        <Reference Include="System.Web" />
         <Reference Include="System.Xml" />
     </ItemGroup>
     <ItemGroup>
+        <Compile Include="BLogic\AuthBL.cs" />
+        <Compile Include="BLogic\OrderBL.cs" />
+        <Compile Include="BLogic\ProductBL.cs" />
+        <Compile Include="BLogic\RoleBL.cs" />
+        <Compile Include="BLogic\UserBL.cs" />
         <Compile Include="BusinessLogicFactory.cs" />
+        <Compile Include="Core\AuthApi.cs" />
+        <Compile Include="Core\OrderApi.cs" />
+        <Compile Include="Core\ProductApi.cs" />
+        <Compile Include="Core\RoleApi.cs" />
+        <Compile Include="Core\UserApi.cs" />
+        <Compile Include="Interfaces\IAuthBL.cs" />
+        <Compile Include="Interfaces\IOrderBL.cs" />
+        <Compile Include="Interfaces\IProductBL.cs" />
+        <Compile Include="Interfaces\IRoleBL.cs" />
+        <Compile Include="Interfaces\IUserBL.cs" />
         <Compile Include="Properties\AssemblyInfo.cs" />
-        <Compile Include="Services\AuthBL.cs" />
-        <Compile Include="Services\AuthService.cs" />
-        <Compile Include="Services\Interfaces\IAuthBL.cs" />
-        <Compile Include="Services\Interfaces\IOrderBL.cs" />
-        <Compile Include="Services\Interfaces\IProductBL.cs" />
-        <Compile Include="Services\Interfaces\IRoleBL.cs" />
-        <Compile Include="Services\Interfaces\IUserBL.cs" />
-        <Compile Include="Services\OrderBL.cs" />
-        <Compile Include="Services\ProductBL.cs" />
-        <Compile Include="Services\RoleBL.cs" />
-        <Compile Include="Services\RoleService.cs" />
-        <Compile Include="Services\UserBL.cs" />
-        <Compile Include="Services\UserService.cs" />
-        <Compile Include="Services\ProductService.cs" />
-        <Compile Include="Services\OrderService.cs" />
     </ItemGroup>
     <ItemGroup>
       <ProjectReference Include="..\UTM.Gamepad.Domain\UTM.Gamepad.Domain.csproj">

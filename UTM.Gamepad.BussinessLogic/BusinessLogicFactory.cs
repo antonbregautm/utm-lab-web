@@ -1,18 +1,11 @@
-using UTM.Gamepad.BussinessLogic.Services;
-using UTM.Gamepad.BussinessLogic.Services.Interfaces;
+using UTM.Gamepad.BussinessLogic.BLogic;
+using UTM.Gamepad.BussinessLogic.Interfaces;
 
 namespace UTM.Gamepad.BussinessLogic
 {
     public class BusinessLogicFactory
     {
         private static BusinessLogicFactory _instance;
-        private static readonly object _lock = new object();
-
-        private IAuthBL _authBL;
-        private IOrderBL _orderBL;
-        private IUserBL _userBL;
-        private IRoleBL _roleBL;
-        private IProductBL _productBL;
 
         private BusinessLogicFactory() { }
 
@@ -22,13 +15,7 @@ namespace UTM.Gamepad.BussinessLogic
             {
                 if (_instance == null)
                 {
-                    lock (_lock)
-                    {
-                        if (_instance == null)
-                        {
-                            _instance = new BusinessLogicFactory();
-                        }
-                    }
+                    _instance = new BusinessLogicFactory();
                 }
                 return _instance;
             }
@@ -36,47 +23,27 @@ namespace UTM.Gamepad.BussinessLogic
 
         public IAuthBL GetAuthBL()
         {
-            if (_authBL == null)
-            {
-                _authBL = new AuthBL();
-            }
-            return _authBL;
+            return new AuthBL();
         }
 
         public IOrderBL GetOrderBL()
         {
-            if (_orderBL == null)
-            {
-                _orderBL = new OrderBL();
-            }
-            return _orderBL;
+            return new OrderBL();
         }
         
         public IUserBL GetUserBL()
         {
-            if (_userBL == null)
-            {
-                _userBL = new UserBL();
-            }
-            return _userBL;
+            return new UserBL();
         }
         
         public IRoleBL GetRoleBL()
         {
-            if (_roleBL == null)
-            {
-                _roleBL = new RoleBL();
-            }
-            return _roleBL;
+            return new RoleBL();
         }
         
         public IProductBL GetProductBL()
         {
-            if (_productBL == null)
-            {
-                _productBL = new ProductBL();
-            }
-            return _productBL;
+            return new ProductBL();
         }
     }
 } 

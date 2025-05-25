@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using UTM.Gamepad.Domain;
 using UTM.Gamepad.Domain.DTOs;
 
-namespace UTM.Gamepad.BussinessLogic.Services.Interfaces
+namespace UTM.Gamepad.BussinessLogic.Interfaces
 {
     public interface IOrderBL
     {
         List<Order> GetAllOrders();
         Order GetOrderById(Guid id);
         List<Order> GetOrdersByUserId(Guid userId);
+        List<Order> GetOrdersByUserId(int userId);
         bool CreateOrder(Order order);
         bool UpdateOrderStatus(Guid orderId, string status, string statusNote = null);
         bool CancelOrder(Guid orderId);
