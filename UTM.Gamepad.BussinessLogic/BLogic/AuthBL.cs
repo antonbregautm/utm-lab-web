@@ -18,61 +18,17 @@ namespace UTM.Gamepad.BussinessLogic.BLogic
         
         public User AuthenticateUser(string email, string password)
         {
-            var user = GetUserByEmailFromDb(email);
-            if (user != null && IsPasswordValid(password, user.PasswordHash))
-            {
-                return user;
-            }
-            return null;
+            return AuthenticateUserFromDb(email, password);
         }
         
         public bool CheckUserAuthorization(User user, string roleRequired)
         {
-            return user.Role != null && user.Role.Name == roleRequired;
+            return CheckUserAuthorizationFromDb(user, roleRequired);
         }
 
         public User CreateAccount(string fullName, string email, string password)
         {
-            if (GetUserByEmailFromDb(email) != null)
-            {
-                return null;
-            }
-            
-            string passwordHash = CreatePasswordHash(password);
-
-            var defaultRole = GetRoleRepository().GetByName("User");
-            
-            if (defaultRole == null)
-            {
-                defaultRole = new Role { Name = "User", Description = "Обычный пользователь системы" };
-                GetRoleRepository().Add(defaultRole);
-            }
-
-            var newUser = new User
-            {
-                FullName = fullName,
-                Email = email,
-                PasswordHash = passwordHash,
-                RoleId = defaultRole.Id,
-                Role = defaultRole  
-            };
-            
-            return GetUserRepository().Add(newUser);
-        }
-        
-        private static new string CreatePasswordHash(string password)
-        {
-            using (var sha256 = SHA256.Create())
-            {
-                var hashedBytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
-                return Convert.ToBase64String(hashedBytes);
-            }
-        }
-
-        private static new bool IsPasswordValid(string password, string storedHash)
-        {
-            string hashedPassword = CreatePasswordHash(password);
-            return hashedPassword == storedHash;
+            return CreateAccountInDb(fullName, email, password);
         }
         
         public User GetUserByEmail(string email)
@@ -80,100 +36,24 @@ namespace UTM.Gamepad.BussinessLogic.BLogic
             return GetUserByEmailFromDb(email);
         }
         
-        // Новые методы с DTO
-        
         public AuthResultDto SignIn(string email, string password)
         {
-            var result = new AuthResultDto
-            {
-                IsSuccess = false,
-                ErrorMessage = "Неверный email или пароль"
-            };
-            
-            var user = AuthenticateUser(email, password);
-            if (user != null)
-            {
-                result.IsSuccess = true;
-                result.ErrorMessage = null;
-                result.UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16);
-                result.Email = user.Email;
-                result.UserRole = user.Role?.Name ?? "User";
-                result.AuthCookie = CreateAuthCookie(user);
-            }
-            
-            return result;
+            return SignInUser(email, password);
         }
         
         public AuthResultDto RegisterUser(string fullName, string email, string password)
         {
-            var result = new AuthResultDto
-            {
-                IsSuccess = false,
-                ErrorMessage = "Пользователь с таким email уже существует"
-            };
-            
-            var user = CreateAccount(fullName, email, password);
-            if (user != null)
-            {
-                result.IsSuccess = true;
-                result.ErrorMessage = null;
-                result.UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16);
-                result.Email = user.Email;
-                result.UserRole = user.Role?.Name ?? "User";
-                result.AuthCookie = CreateAuthCookie(user);
-            }
-            
-            return result;
+            return RegisterUserInDb(fullName, email, password);
         }
         
         public UserProfileDto GetUserProfile(string email)
         {
-            var user = GetUserByEmail(email);
-            if (user == null)
-            {
-                return null;
-            }
-            
-            return new UserProfileDto
-            {
-                UserId = Convert.ToInt32(user.Id.ToString().Substring(0, 8), 16),
-                FullName = user.FullName,
-                Email = user.Email,
-                RoleName = user.Role?.Name ?? "Пользователь"
-            };
+            return GetUserProfileFromDb(email);
         }
         
         public SignOutResultDto SignOut()
         {
-            FormsAuthentication.SignOut();
-            
-            var authCookie = new HttpCookie(FormsAuthentication.FormsCookieName, "")
-            {
-                Expires = DateTime.Now.AddYears(-1)
-            };
-            
-            return new SignOutResultDto
-            {
-                AuthCookie = authCookie
-            };
-        }
-        
-        // Вспомогательный метод для создания куки аутентификации
-        private HttpCookie CreateAuthCookie(User user)
-        {
-            string roleName = user.Role?.Name ?? "User";
-            
-            var ticket = new FormsAuthenticationTicket(
-                1, // ticket version
-                user.Email,
-                DateTime.Now,
-                DateTime.Now.AddMinutes(30), // expiration
-                true, // persistent cookie
-                roleName, // user data
-                "/");
-
-            var encryptedTicket = FormsAuthentication.Encrypt(ticket);
-            return new HttpCookie(FormsAuthentication.FormsCookieName, encryptedTicket);
+            return SignOutUser();
         }
     }
 } 

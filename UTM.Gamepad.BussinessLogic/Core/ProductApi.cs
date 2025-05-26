@@ -52,5 +52,31 @@ namespace UTM.Gamepad.BussinessLogic.Core
                 return false;
             }
         }
+        
+        protected bool DeleteProductFromDb(Guid id)
+        {
+            try
+            {
+                var product = GetProductByIdFromDb(id);
+                if (product != null)
+                {
+                    _productRepository.Delete(id);
+                    return true;
+                }
+                return false;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+        
+        protected List<Product> GetFeaturedProductsFromDb(int count)
+        {
+            return GetAllProductsFromDb()
+                .OrderByDescending(p => p.Price)
+                .Take(count)
+                .ToList();
+        }
     }
 } 

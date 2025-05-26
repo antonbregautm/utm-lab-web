@@ -88,5 +88,139 @@ namespace UTM.Gamepad.BussinessLogic.Core
         {
             return _roleRepository.GetById(Guid.Parse(id.ToString()));
         }
+        
+        protected Role GetRoleByGuidId(Guid id)
+        {
+            return _roleRepository.GetById(id);
+        }
+        
+        protected bool UpdateUserWithoutPasswordInDb(User user)
+        {
+            if (user == null || user.Id == Guid.Empty)
+            {
+                return false;
+            }
+            
+            var existingUser = GetUserByIdFromDb(user.Id);
+            if (existingUser == null)
+            {
+                return false;
+            }
+            
+            // Сохраняем пароль
+            user.PasswordHash = existingUser.PasswordHash;
+            
+            return UpdateUserInDb(user);
+        }
+        
+        protected bool UpdateUserBasicInfoInDb(Guid id, string fullName, string email)
+        {
+            var user = GetUserByIdFromDb(id);
+            if (user == null)
+            {
+                return false;
+            }
+            
+            user.FullName = fullName;
+            user.Email = email;
+            
+            return UpdateUserWithoutPasswordInDb(user);
+        }
+        
+        protected bool AssignRoleToUserInDb(Guid userId, int roleId)
+        {
+            var user = GetUserByIdFromDb(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            
+            var role = GetRoleById(roleId);
+            if (role == null)
+            {
+                return false;
+            }
+            
+            user.RoleId = role.Id;
+            user.Role = role;
+            
+            return UpdateUserInDb(user);
+        }
+        
+        protected bool ResetUserPasswordInDb(Guid userId, string newPassword)
+        {
+            var user = GetUserByIdFromDb(userId);
+            if (user == null || string.IsNullOrEmpty(newPassword))
+            {
+                return false;
+            }
+            
+            user.PasswordHash = CreatePasswordHash(newPassword);
+            
+            return UpdateUserInDb(user);
+        }
+        
+        protected bool ChangeUserRoleInDb(Guid userId, Guid roleId)
+        {
+            var user = GetUserByIdFromDb(userId);
+            if (user == null)
+            {
+                return false;
+            }
+            
+            user.RoleId = roleId;
+            
+            return UpdateUserInDb(user);
+        }
+        
+        protected bool CreateUserInDb(User user, string password)
+        {
+            if (user == null || string.IsNullOrEmpty(password))
+            {
+                return false;
+            }
+            
+            // Проверяем, не существует ли уже пользователь с таким email
+            if (GetUserByEmailFromDb(user.Email) != null)
+            {
+                return false;
+            }
+            
+            // Устанавливаем новый ID, если он не задан
+            if (user.Id == Guid.Empty)
+            {
+                user.Id = Guid.NewGuid();
+            }
+            
+            // Хешируем пароль
+            user.PasswordHash = CreatePasswordHash(password);
+            
+            return SaveUserToDb(user);
+        }
+        
+        protected User CreateUserWithRoleInDb(string fullName, string email, string password, Guid roleId)
+        {
+            // Проверяем, не существует ли уже пользователь с таким email
+            if (GetUserByEmailFromDb(email) != null)
+            {
+                return null;
+            }
+            
+            var user = new User
+            {
+                Id = Guid.NewGuid(),
+                FullName = fullName,
+                Email = email,
+                PasswordHash = CreatePasswordHash(password),
+                RoleId = roleId
+            };
+            
+            if (SaveUserToDb(user))
+            {
+                return user;
+            }
+            
+            return null;
+        }
     }
 } 

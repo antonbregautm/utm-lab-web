@@ -23,10 +23,7 @@ namespace UTM.Gamepad.BussinessLogic.BLogic
         
         public List<Product> GetFeaturedProducts(int count = 8)
         {
-            return GetAllProducts()
-                .OrderByDescending(p => p.Price)
-                .Take(count)
-                .ToList();
+            return GetFeaturedProductsFromDb(count);
         }
         
         public bool CreateProduct(Product product)
@@ -36,7 +33,7 @@ namespace UTM.Gamepad.BussinessLogic.BLogic
                 return false;
             }
             
-            // Устанавливаем дату создания
+            // Устанавливаем ID если он пустой
             if (product.Id == Guid.Empty)
             {
                 product.Id = Guid.NewGuid();
@@ -68,22 +65,7 @@ namespace UTM.Gamepad.BussinessLogic.BLogic
                 return false;
             }
             
-            var product = GetProductById(id);
-            if (product == null)
-            {
-                return false;
-            }
-            
-            try
-            {
-                // Здесь должна быть логика удаления продукта
-                // Так как у нас нет метода DeleteProductFromDb, то этот метод будет заглушкой
-                return true;
-            }
-            catch
-            {
-                return false;
-            }
+            return DeleteProductFromDb(id);
         }
     }
 } 
